@@ -52,6 +52,12 @@
 \end{frame}
 
 \begin{frame}
+    {Logistics}
+    \begin{itemize}
+        \item HW1 due this Friday.
+        \item Lecture (~65 min)
+        \item Section on Pytorch and HPC (~50 min)
+    \end{itemize}
 
 \end{frame}
 
@@ -690,7 +696,7 @@ $$
     \end{itemize}
     \pause
 
-    \textbf{LSTM}: learn when to update or reset a hidden state\\
+    \textbf{LSTM}: learn when to update the hidden state\\
     \begin{itemize}
         \item First successful solution to the gradient vanishing and explosion problem 
     \end{itemize}
@@ -698,8 +704,8 @@ $$
 
     Key idea is to use a \textbf{gating mechanism}: multiplicative weights that modulate another variable \\
     \begin{itemize}
-        \item How much should a given input affect the state?
-        \item Should the state be reset to 0?
+        \item How much should the new input affect the state?
+        \item When to ignore new inputs?
         \item How much should the state affect the output? 
     \end{itemize}
 \end{frame}
@@ -713,7 +719,7 @@ $$
 
     Update with the new input $x_t$ (same as in vanilla RNN)
     $$
-    \tilde{c}_t = \tanh(W_{xc}x_t + W_{hc}h_{t-1} + b_c)
+    \tilde{c}_t = \tanh(W_{xc}x_t + W_{hc}h_{t-1} + b_c) \quad \text{\blue{new cell content}}
     $$
 
     \pause\vspace{-1ex}
@@ -726,8 +732,9 @@ $$
         \includegraphics[height=4cm]{figures/lstm-2}
         \caption{10.1.3 from \href{https://d2l.ai/chapter_recurrent-modern/lstm.html}{d2l.ai}}
     \end{figure}
+    \vspace{-1em}
 
-    Choose between $\tilde{c}_t$ (update) and $c_{t-1}$ (no update): 
+    Choose between $\tilde{c}_t$ (\blue{update}) and $c_{t-1}$ (\red{no update}): 
     $$
     \textbf{memory cell} \quad
     c_t = i_t \odot \tilde{c}_t + f_t \odot c_{t-1}
@@ -735,8 +742,8 @@ $$
 
     \vspace{-1ex}
     \begin{itemize}
-        \item $f_t$: proportion of the old state
-        \item $i_t$: proportion of the new state
+        \item $f_t$: proportion of the old state (\red{preserve or erase the old memory})
+        \item $i_t$: proportion of the new state (\blue{write or ignore the new input})
         \item What is $c_t$ if $f_t=1$ and $i_t=0$?
     \end{itemize}
 \end{frame}
@@ -774,7 +781,7 @@ $$
     Intuition: gating allows the network to learn to control how much gradient should vanish.
     \begin{itemize}
         \item Vanilla RNN: gradient depends on repeated multiplication of the \blue{same weight matrix}
-        \item LSTM: gradient depends on repeated multiplication of some quantity with learned components (values of \blue{input and forget gates})
+        \item LSTM: gradient depends on repeated multiplication of some quantity that depends on the data (values of \blue{input and forget gates})
         \item So the network can learn to reset or update the gradient depending on whether there is long-range dependencies in the data.
     \end{itemize}
     \pdfnote{
