@@ -735,6 +735,7 @@ $$
     \vspace{-1em}
 
     Choose between $\tilde{c}_t$ (\blue{update}) and $c_{t-1}$ (\red{no update}): 
+    ($\odot$ means elementwise multiplication)
     $$
     \textbf{memory cell} \quad
     c_t = i_t \odot \tilde{c}_t + f_t \odot c_{t-1}
@@ -754,7 +755,7 @@ $$
         \includegraphics[height=4cm]{figures/lstm-2}
     \end{figure}
 
-    Input gate and forget gate:
+    Input gate and forget gate \blue{depends on data}:
             \begin{align*}
  i_t &= \text{sigmoid}(W_{xi}x_t + W_{hi}h_{t-1} + b_i) \;,\\
  f_t &= \text{sigmoid}(W_{xf}x_t + W_{hf}h_{t-1} + b_f) \;.
@@ -1068,8 +1069,8 @@ $$
 
 \begin{frame}
     {Position embedding}
-    Motivation: model word order in the input sequence\\
-    Solution: add a position embedding to each word
+    \textbf{Motivation}: model word order in the input sequence\\
+    \textbf{Solution}: add a position embedding to each word
     \begin{figure}
         \includegraphics[height=3cm]{figures/position-embedding}
     \end{figure}
@@ -1077,28 +1078,111 @@ $$
     Position embedding:\\
     \begin{itemize}
         \item Encode absolute and relative positions of a word
-        \item (Same dimension as word embeddings)
+        \item Same dimension as word embeddings
         \item Learned or deterministic 
     \end{itemize}
 \end{frame}
 
 \begin{frame}
     {Sinusoidal position embedding}
+    \textbf{Intuition}: continuous approximation of binary encoding of positions (integers)
+    \vspace{-2em}
+
     \begin{figure}
-        \includegraphics[width=\textwidth]{figures/sinusoidal}
+        \includegraphics[height=4cm]{figures/binary}\pause
+        \includegraphics[height=4cm]{figures/sin}\pause
+        \includegraphics[height=4cm]{figures/pos}
+        \caption{From \href{https://kazemnejad.com/blog/transformer_architecture_positional_encoding/}{Amirhossein Kazemnejad's Blog}}
     \end{figure}
+
+    \vspace{-2em}
+    \begin{align*}
+        \omega_{2i} = \omega_{2i+1} = 1 / 10000^{\frac{2i}{d}}
+    \end{align*}
 \end{frame}
 
 \begin{frame}
-    {Residual connection and layer normalization}
+    {Learned position embeddings}
+
+    Sinusoidal position embedding:\\
+    \begin{itemize}
+        \item Not learnable
+        \item Extrapolating to longer sequences doesn't work 
+    \end{itemize}
+    \pause
+
+    Learned absolute position embeddings (most used now):\\
+    \begin{itemize}
+        \item Consider each position as a word. Map positions to dense vectors: $W_{d\times n}\phi_{\text{one-hot}(\text{pos})}$
+        \item Column $i$ of $W$ is the embedding of position $i$
+            \pause
+        \item Need to fix maximum position/length beforehand
+        \item Cannot extrapolate to longer sequences
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Residual connection}
+
+    \textbf{Motivation}:\\
+    \begin{itemize}
+        \item Gradient explosion/vanishing is not RNN-specific!
+        \item It happens to all very \blue{deep} networks (which are \red{hard to optimize}).
+            \pause
+        \item In principle, a deep network can always represent a shallow network (by setting higher layers to identity functions), thus it should be at least as good as the shallow network.
+        \item How can we make it easier to recover the shallow solution?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Residual connection}
+
+    \textbf{Solution}: \href{https://arxiv.org/pdf/1512.03385.pdf}{Deep Residual Learning for Image Recognition} [He et al., 2015]\\
+    \begin{figure}
+        \includegraphics[height=5cm]{figures/residual}
+    \end{figure}
+
+    Learn the residual layer: $g(x) = f(x) - x$
+
+    If the shallow network is better, set $g(x)=0$ (easier to learn).
+\end{frame}
+
+\begin{frame}
+    {Layer normalization}
+    
+    \href{https://arxiv.org/pdf/1607.06450.pdf}{Layer Normalization} [Ba et al., 2016]\\
+    \begin{itemize}
+        \item Normalize (zero mean, unit variance) across features
+        \item Let $x=(x_1,\ldots,x_d)$ be the input vector (e.g., word embedding, previous layer output)
+            \begin{align*}
+                \mathrm{LayerNorm}(x) &= \frac{x-\hat{\mu}}{\hat{\sigma}},\\
+                \text{where} \; \hat{\mu} = \frac{1}{d}{\sum_{i=1}^d x_i}, &\quad \hat{\sigma} = \frac{1}{d}{\sum_{i=1}^d (x_i-\hat{\mu})^2}
+            \end{align*}
+        \pause
+    \item A deterministic transformation of the input
+    \item Independent of train/inference and batch size
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Residual connection and layer normalization in Transformer}
     \begin{figure}
         \includegraphics[height=5cm]{figures/add-norm}
     \end{figure}
     \vspace{-2em}
     \begin{itemize}
-        \item Residual connection: add input to the output of each layer 
-        \item Layer normalization: normalize (zero mean, unit variance) over all features for each sample in the batch
+        \item Add (residual connection) \& Normalize (layer normalization) after each layer
         \item Position-wise feed-forward networks: same mapping for all positions
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Summary}
+    \begin{itemize}
+        \item We have seen two families of models for sequences modeling: \textbf{RNNs} and \textbf{Transformers}
+        \item Both take a sequence of (discrete) symbols as input and output a sequence of embeddings
+        \item They are often called \textbf{encoders} and are used to represent text
+        \item Transformers are dominating today because of its scalability
     \end{itemize}
 \end{frame}
 
