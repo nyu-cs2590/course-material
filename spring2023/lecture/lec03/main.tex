@@ -1154,14 +1154,25 @@ $$
     \begin{itemize}
         \item Normalize (zero mean, unit variance) across features
         \item Let $x=(x_1,\ldots,x_d)$ be the input vector (e.g., word embedding, previous layer output)
+            \vspace{-1em}
             \begin{align*}
                 \mathrm{LayerNorm}(x) &= \frac{x-\hat{\mu}}{\hat{\sigma}},\\
-                \text{where} \; \hat{\mu} = \frac{1}{d}{\sum_{i=1}^d x_i}, &\quad \hat{\sigma} = \frac{1}{d}{\sum_{i=1}^d (x_i-\hat{\mu})^2}
+                \text{where} \; \hat{\mu} = \frac{1}{d}{\sum_{i=1}^d x_i}, &\quad \hat{\sigma}^2 = \frac{1}{d}{\sum_{i=1}^d (x_i-\hat{\mu})^2}
             \end{align*}
-        \pause
+    \end{itemize}
+    \pause
+  
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \includegraphics[height=4cm]{figures/batchnorm}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+    \begin{itemize}
     \item A deterministic transformation of the input
     \item Independent of train/inference and batch size
     \end{itemize}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 \begin{frame}
