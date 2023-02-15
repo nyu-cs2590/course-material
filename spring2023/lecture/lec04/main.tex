@@ -44,7 +44,7 @@
 \institute[NYU]{
     \includegraphics[height=1cm]{../figures/nyu-logo}\\
 }
-\date{February 13, 2023}
+\date{February 14, 2023}
 
 \begin{document}
 \begin{frame}
@@ -271,26 +271,6 @@
 \end{frame}
 
 \begin{frame}
-    {Decoder attention masking}
-
-    Recall that the output of self-attention depends on all tokens $y_1,\ldots y_m$.
-
-    But the decoder is supposed to model $p(y_t\mid y_{<t}, x)$.
-
-    It should not look at the ``future'' ($y_{t+1},\ldots,y_m$)!
-
-    \pause
-    How do we fix the decoder self-attention?\\
-    \begin{itemize}
-        \item Mathematically, changing the input values and keys suffices.
-        \item Practically, set $a(s_i, s_j)$ to $-\inf$ for all $j>i$ and for $i=1,\ldots,m$.
-            \begin{itemize}
-                \item The attention matrix is a lower-triangular matrix.
-            \end{itemize}
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
     {Impact on NLP}
     \begin{itemize}
         \item Initially designed for sequential data and obtained SOTA results on MT
@@ -324,6 +304,27 @@
     \end{figure}
         }
 \end{frame}
+
+\begin{frame}
+    {Decoder attention masking}
+
+    Recall that the output of self-attention depends on all tokens $y_1,\ldots y_m$.
+
+    But the decoder is supposed to model $p(y_t\mid y_{<t}, x)$.
+
+    It should not look at the ``future'' ($y_{t+1},\ldots,y_m$)!
+
+    \pause
+    How do we fix the decoder self-attention?\\
+    \begin{itemize}
+        \item Mathematically, changing the input values and keys suffices.
+        \item Practically, set $a(s_i, s_j)$ to $-\inf$ for all $j>i$ and for $i=1,\ldots,m$.
+            \begin{itemize}
+                \item The attention matrix is a lower-triangular matrix.
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
 
 \begin{frame}
     {Inference}
