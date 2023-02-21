@@ -1,0 +1,44 @@
+\documentclass[crop,tikz]{standalone}
+\usepackage{amstext}
+\usepackage{amssymb}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shapes.misc}
+
+\begin{document}
+
+\include{style}
+
+\begin{tikzpicture}
+
+% bottom layer
+\foreach \i/\j in {1/a,2/good,3/book}{
+    \node (l1-\i) [vector={red}] at(3.5*\i,0) {$\j$};
+    \node (l2-\i) [vector] [above= of l1-\i] {$\phi_{\text{one-hot}}(x)$};
+    \node (l3-\i) [vector] [above= of l2-\i] {$W_{1\i} x$};
+    %\node (l4-\i) [vector] [above= of l3-\i] {$s_\i$};
+}
+
+% last layer
+\node (concat) [vector] [above= of l3-2] {$[x_1;x_2;x_3]$};
+\node (hidden) [vector] [above= of concat] {$\sigma(W_{2}x+b)$};
+\node (top) [vector] [above= of hidden] {$\text{softmax}(W_ox+b)$};
+
+% connection
+\foreach \i in {1,...,3}{
+    \path [arrow] (l1-\i) -- node [right] {} (l2-\i);
+    \path [arrow] (l2-\i) -- node [right] {} (l3-\i);
+    \path [arrow] (l3-\i) -- node [right] {} (concat);
+}
+    \path [arrow] (concat) -- node [right] {} (hidden);
+    \path [arrow] (hidden) -- (top);
+
+% comment
+\node (l1-text) [right=2cm of l1-3] {input words};
+\node (l2-text) [right=2cm of l2-3] {one-hot embedding};
+\node (l3-text) [right=2cm of l3-3] {dense embedding};
+\node (l4-text) [right=2cm of concat] {concatenation};
+\node (l5-text) [right=2cm of hidden] {``merge''};
+\node (top-text) [right=2cm of top] {classification};
+
+\end{tikzpicture}
+\end{document}
