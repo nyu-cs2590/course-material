@@ -357,7 +357,7 @@
     \begin{itemize}
         \item \textbf{Greedy decoding}: return the \green{most likely symbol} at each step
             $$
-            y_t = \argmax_{y\in\green{\sV_{\text{out}}}} p(y\mid x, y_{<t}; \theta)
+            y_t = \argmax_{y\in\green{\sV_{\text{out}}}} p(y\mid x, \hat{y}_{<t}; \theta)
             $$
     \end{itemize}
 \end{frame}
