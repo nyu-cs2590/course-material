@@ -103,6 +103,7 @@
 \begin{frame}
     {Capability vs alignment}
 
+    \vspace{1em}
         \begin{columns}
         \begin{column}{0.3\textwidth}
         \includegraphics[width=0.9\textwidth]{figures/tools}
@@ -118,6 +119,7 @@
         \end{column}
         \end{columns}
 
+        \pause
         \begin{columns}
         \begin{column}{0.3\textwidth}
         \includegraphics[width=\textwidth]{figures/choice}
@@ -278,16 +280,6 @@
     {Approaches to alignment}
     \begin{itemize}
         \itemsep1em
-        \item \textbf{Prompting}: \blue{ask} the model to behave according to human values
-        \item \textbf{Finetuning / Supervised learning}: \blue{show} the model the right response in various context
-        \item \textbf{Reinforcement learning}: \blue{reward / punish} the model when its behavior is aligned / unaligned with humans 
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-    {Approaches to alignment}
-    \begin{itemize}
-        \itemsep1em
             
         \item \textcolor{fg!20}{
                 \textbf{Prompting}: {ask} the model to behave according to human values
@@ -359,6 +351,7 @@
             \end{itemize}
         \end{column}
         \begin{column}{0.5\textwidth}
+            \onslide<4->{
                     \begin{tikzpicture}
                         \node (m) {model};
                         \node (r) [below right=1.5cm and 0.5cm of m] {raw data};
@@ -367,6 +360,7 @@
                         \draw[arrow] (t) -- node[above,sloped,anchor=south] {finetuning} (m);
                         \draw[arrow] (r) -- node[above] {annotation} (t);
                     \end{tikzpicture}
+                }
         \end{column}
         \end{columns}
 \end{frame}
@@ -424,8 +418,8 @@
     \begin{itemize}
         \itemsep1em
             
-        \item \textcolor<2->{fg!20}{\textbf{Prompting}: {ask} the model to behave according to human values}
-        \item \textcolor<2->{fg!20}{\textbf{Finetuning / Supervised learning}: {show} the model the right response in various context
+        \item \textcolor<1->{fg!20}{\textbf{Prompting}: {ask} the model to behave according to human values}
+        \item \textcolor<1->{fg!20}{\textbf{Finetuning / Supervised learning}: {show} the model the right response in various context
         }
         \item \textbf{Reinforcement learning}: \blue{reward / punish} the model when its behavior is aligned / unaligned with humans 
     \end{itemize}
@@ -459,7 +453,7 @@
                     {\em No reponse}
                 \item Agent updates its \textbf{policy} (on what actions to take) \hfill \onslide<6->{\blue{\em learn}}\\
                     {\em Find a connection? Get an internship? Apply for a different position?}
-                \item Go back to 1 \hfill \blue<6->{\em rinse and repeat} 
+                \item Go back to 1 \hfill \onslide<6->{\blue{\em rinse and repeat}}
             \end{enumerate}
 \end{frame}
 
