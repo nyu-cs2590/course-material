@@ -793,9 +793,9 @@ overall good movie for anyone looking for a laugh
         \begin{align}
             p(y)&=\onslide<+->{\text{Bernoulli}(\alpha)} \\
             p(x\mid y)&=\onslide<+->{\prod_{i=1}^n p(x_i\mid y)\quad\quad \text{(independent assumption)}}\\
-                &=\onslide<+->{\prod_{i=1}^n \text{Categorical}(
-                \underbrace{\theta_{1,y},\ldots,\theta_{|\sV|,y}}_{\text{sum to 1}}
-                )}
+            \onslide<+->{p(x_i=w\mid y) &= \theta_{w,y} \quad \text{where $w\in\sV$}\\
+            \sum_{w\in\sV} \theta_{w,y} &= 1
+                }
         \end{align}
     }
     \vspace{-1ex}
