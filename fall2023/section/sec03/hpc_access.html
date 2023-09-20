@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+ <head> 
+  <title>IntelliJ Markdown Preview</title>               
+  <style>/* Reworked by IntelliJ Team The MIT License (MIT) Copyright (c) JetBrains Adapted from https://github.com/sindresorhus/github-markdown-css The MIT License (MIT) Copyright (c) Sindre Sorhus &lt;sindresorhus@gmail.com&gt; (sindresorhus.com) Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */ @font-face { font-family: octicons-anchor; src: url(data:font/woff;charset=utf-8;base64,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) format('woff'); } body { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; font-family: Helvetica, Arial, freesans, sans-serif; font-size: 14px; line-height: 1.6; word-wrap: break-word; margin: 0 2em; } strong { font-weight: bold; } img { border: 0; } input { color: inherit; font: inherit; margin: 0; line-height: normal; } html input[disabled] { cursor: default; } input[type="checkbox"] { box-sizing: border-box; padding: 0; } body * { box-sizing: border-box; } input { font: 13px/1.4 Helvetica, arial, nimbussansl, liberationsans, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; } a { text-decoration: none; } a:hover, a:active { text-decoration: underline; } hr { height: 1px; padding: 0; margin: 20px 0; border: 0 none; } hr:before { display: table; content: ""; } hr:after { display: table; clear: both; content: ""; } blockquote { margin: 0; } ul, ol { padding: 0; margin-top: 0; margin-bottom: 0; } ol ol, ul ol { list-style-type: lower-roman; } ul ul ol, ul ol ol, ol ul ol, ol ol ol { list-style-type: lower-alpha; } dd { margin-left: 0; } .octicon { font: normal normal normal 16px/1 octicons-anchor; display: inline-block; text-decoration: none; text-rendering: auto; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; } .octicon-link:before { content: '\f05c'; } .markdown-body &gt; *:first-child { margin-top: 0 !important; } .markdown-body &gt; *:last-child { margin-bottom: 0 !important; } .anchor { position: absolute; top: 0; left: 0; display: block; padding-right: 6px; padding-left: 30px; margin-left: -30px; } .anchor:focus { outline: none; } h1, h2, h3, h4, h5, h6 { position: relative; margin-top: 1em; margin-bottom: 16px; font-weight: bold; line-height: 1.4; } h1 .octicon-link, h2 .octicon-link, h3 .octicon-link, h4 .octicon-link, h5 .octicon-link, h6 .octicon-link { display: none; color: #000; vertical-align: middle; } h1:hover .anchor, h2:hover .anchor, h3:hover .anchor, h4:hover .anchor, h5:hover .anchor, h6:hover .anchor { padding-left: 8px; margin-left: -30px; text-decoration: none; } h1:hover .anchor .octicon-link, h2:hover .anchor .octicon-link, h3:hover .anchor .octicon-link, h4:hover .anchor .octicon-link, h5:hover .anchor .octicon-link, h6:hover .anchor .octicon-link { display: inline-block; } h1 { font-size: 2.2em; padding-top: 0.6em; } h1 .anchor { line-height: 1; } h2 { font-size: 1.8em; line-height: 1.2; padding-top: 0.6em; } h2 .anchor { line-height: 1.2; } h3 { font-size: 1.3em; line-height: 1; padding-top: 0.6em; } h3 .anchor { line-height: 1.2; } h4 { font-size: 1em; } h4 .anchor { line-height: 1.2; } h5 { font-size: 1em; } h5 .anchor { line-height: 1.1; } h6 { font-size: 1em; } h6 .anchor { line-height: 1.1; } p, blockquote, ul, ol, dl, table, pre { margin-top: 16px; margin-bottom: 16px; } ul, ol { padding-left: 2em; } ul ul, ul ol, ol ol, ol ul { margin-top: 0; margin-bottom: 0; } li &gt; p { margin-top: 0; margin-bottom: 0; } dl { padding: 0; } dl dt { padding: 0; margin-top: 16px; font-size: 1em; font-style: italic; font-weight: bold; } dl dd { padding: 0 16px; margin-bottom: 16px; } blockquote { padding: 10px 10px 10px 16px; border-left: 2px solid; border-radius: 0 3px 3px 0; } blockquote &gt; :first-child { margin-top: 0; } blockquote &gt; :last-child { margin-bottom: 0; } table { display: block; width: 100%; overflow: auto; word-break: normal; border-collapse: collapse; border-spacing: 0; font-size: 1em; } table th { font-weight: bold; } table th, table td { padding: 6px 13px; background: transparent; } table tr { border-top: 1px solid; } img { max-width: 100%; box-sizing: border-box; } code { font: 0.9em "JetBrains Mono", Consolas, "Liberation Mono", Menlo, Courier, monospace; padding: 0.2em 0.4em; margin: 2px; border-radius: 3px; } pre &gt; code { padding: 0; margin: 0; font-size: 100%; word-break: normal; white-space: pre; background: transparent; border: 0; } .highlight { margin-bottom: 16px; } .highlight pre, pre { font: 0.85em "JetBrains Mono", Consolas, "Liberation Mono", Menlo, Courier, monospace; padding: 16px; overflow: auto; line-height: 1.45; border-radius: 3px; } pre code { display: inline; max-width: initial; padding: 0; margin: 0; overflow: initial; line-height: inherit; word-wrap: normal; background-color: transparent; border: 0; } pre code:before, pre code:after { content: normal; } kbd { font: 0.9em "JetBrains Mono", Consolas, "Liberation Mono", Menlo, Courier, monospace; padding: 0.2em 0.4em; margin: 2px; border-radius: 3px; } .task-list-item { list-style-type: none; } .task-list-item + .task-list-item { margin-top: 3px; } .task-list-item input { margin: 0 0.35em 0.25em -0.6em; vertical-align: middle; } :checked + .radio-label { z-index: 1; position: relative; } span.user-del { text-decoration: line-through; } ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-thumb { -webkit-border-radius: 10px; } ::-webkit-scrollbar-track:vertical { -webkit-box-shadow: -1px 0 0 #ededed; } ::-webkit-scrollbar-track { background-color: transparent; } ::-webkit-scrollbar { width: 6px; } </style>
+  <style>body { background-color: rgba(255, 255, 255, 255.0); font-size: 14px !important; } body, p, blockquote, ul, ol, dl, table, pre, code, tr { color: rgba(51, 51, 51, 255.0); } a { color: rgba(121, 203, 96, 255.0); } table td, table th { border: 1px solid rgba(223, 225, 228, 255.0); } hr { background-color: rgba(223, 225, 228, 255.0); } kbd, tr { border: 1px solid rgba(223, 225, 228, 255.0); } h6 { color: rgba(41, 45, 49, 255.0); } blockquote { border-left: 2px solid rgba(121, 203, 96, 0.4); } ::-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.2); } blockquote, code, pre { background-color: rgba(212, 222, 231, 0.24705882352941178); }</style>
+  <style>/* Copyright 2000-2021 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file. */ .code-fence-highlighter-copy-button { display: flex; position: absolute; float: left; margin-left: -1em; margin-top: -1em; } .code-fence-highlighter-copy-button-icon { max-width: 1em; } .code-fence:hover .code-fence-highlighter-copy-button-icon { /*noinspection CssUnknownTarget*/ content: url("copy-button-copy-icon.png"); } .code-fence:hover .code-fence-highlighter-copy-button:hover .code-fence-highlighter-copy-button-icon { /*noinspection CssUnknownTarget*/ content: url("copy-button-copy-icon-hovered.png"); cursor: pointer; } </style>
+  <style>/* Copyright 2000-2021 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file. */ .run-icon &gt; img { max-width: 1em; vertical-align: text-top; margin-right: 0.3em; } .code-block { position: absolute; left: 1em; } .hidden { display: none; }</style>
+ </head> 
+ <body>
+  <div md-src-pos="0..2341">
+   <h1 md-src-pos="0..36">Verifying Access to the HPC System</h1>
+   <p md-src-pos="38..276"><span md-src-pos="38..169">This tutorial guides you through the steps to confirm that you can successfully access the HPC resources available for this course.</span> <span md-src-pos="170..210">If you encounter any issues logging into</span> <code md-src-pos="211..219">greene</code> <span md-src-pos="220..222">or</span> <code md-src-pos="223..230">burst</code><span md-src-pos="230..231">,</span> <span md-src-pos="232..276">please contact the course staff immediately.</span></p>
+   <h2 md-src-pos="278..308">Part 1: Logging into Greene</h2>
+   <h3 md-src-pos="310..327">Prerequisites</h3>
+   <ul md-src-pos="328..406">
+    <li md-src-pos="328..358">Terminal app on Linux or Mac</li>
+    <li md-src-pos="359..406">Command Prompt or an SSH client on Windows 10</li>
+   </ul>
+   <h3 md-src-pos="408..417">Steps</h3>
+   <ol md-src-pos="418..466">
+    <li md-src-pos="418..466"><strong md-src-pos="421..464">Initial SSH into HPC Gateway (Optional)</strong>: </li>
+   </ol>
+   <ul md-src-pos="467..861">
+    <li md-src-pos="467..655">If you're already connected to the NYU Network or using the <a href="https://www.nyu.edu/life/information-technology/infrastructure/network-services/vpn.html" md-src-pos="531..630">NYU VPN</a>, you can skip this step.</li>
+    <li md-src-pos="656..861">Otherwise, open your terminal or command prompt and run the following SSH command:<pre class="code-fence" md-src-pos="747..861">
+      <div class="code-fence-highlighter-copy-button" data-fence-content="c3NoIDxOZXRJRD5AZ3cuaHBjLm55dS5lZHUgIyBXaGVuIHByb21wdGVkLCBlbnRlciB0aGUgcGFzc3dvcmQgYXNzb2NpYXRlZCB3aXRoIHlvdXIgTllVIE5ldElELg==">
+  
+       <img class="code-fence-highlighter-copy-button-icon">
+
+      </div><code class="language-bash" md-src-pos="747..861"><a class="run-icon hidden code-block" href="#" role="button" data-command="Run:1b692da3482f190dcd7058bbae1639d1" data-commandtype="block"><img src="http://localhost:63342/4f800f8a-bbed-4dd8-b03c-00449c9f6698/1926695178/runrun.png?_ijt=cneq5lh4t6clt5j0q9u2d98bls"></a><span md-src-pos="747..755"></span><span md-src-pos="755..850">ssh <span style="color: rgb(167, 29, 93);">&lt;</span>NetID<span style="color: rgb(167, 29, 93);">&gt;</span>@gw.hpc.nyu.edu <span style="color: rgb(150, 152, 150);"># When prompted, enter the password associated with your NYU NetID.</span></span>
+<span md-src-pos="850..851"></span><span md-src-pos="854..861"></span></code></pre></li>
+   </ul>
+   <ol start="2" md-src-pos="863..887">
+    <li md-src-pos="863..887"><strong md-src-pos="866..885">SSH into Greene</strong>: </li>
+   </ol>
+   <ul md-src-pos="888..1004">
+    <li md-src-pos="888..1004">Type the following command in the terminal and hit enter:<pre class="code-fence" md-src-pos="954..1004">
+      <div class="code-fence-highlighter-copy-button" data-fence-content="c3NoIDxOZXRJRD5AZ3JlZW5lLmhwYy5ueXUuZWR1">
+  
+       <img class="code-fence-highlighter-copy-button-icon">
+
+      </div><code class="language-bash" md-src-pos="954..1004"><a class="run-icon hidden code-block" href="#" role="button" data-command="Run:69e8657c7027cc9140038b1530e89420" data-commandtype="block"><img src="http://localhost:63342/4f800f8a-bbed-4dd8-b03c-00449c9f6698/1926695178/runrun.png?_ijt=cneq5lh4t6clt5j0q9u2d98bls"></a><span md-src-pos="954..962"></span><span md-src-pos="962..993">ssh <span style="color: rgb(167, 29, 93);">&lt;</span>NetID<span style="color: rgb(167, 29, 93);">&gt;</span>@greene.hpc.nyu.edu</span>
+<span md-src-pos="993..994"></span><span md-src-pos="997..1004"></span></code></pre></li>
+   </ul>
+   <ol start="3" md-src-pos="1006..1039">
+    <li md-src-pos="1006..1039"><strong md-src-pos="1009..1037">Confirm Successful Login</strong>: </li>
+   </ol>
+   <ul md-src-pos="1040..1151">
+    <li md-src-pos="1040..1151">After running the above command, your terminal prompt should change to something like <code md-src-pos="1130..1150">[&lt;NetID&gt;@log-3 ~]$</code>.</li>
+   </ul>
+   <h2 md-src-pos="1153..1182">Part 2: Logging into Burst</h2>
+   <h3 md-src-pos="1184..1193">Steps</h3>
+   <ol md-src-pos="1194..1229">
+    <li md-src-pos="1194..1229"><strong md-src-pos="1197..1227">SSH into Burst from Greene</strong>: </li>
+   </ol>
+   <ul md-src-pos="1230..1333">
+    <li md-src-pos="1230..1333">While logged into a <code md-src-pos="1254..1262">greene</code> node, execute the following command:<pre class="code-fence" md-src-pos="1304..1333">
+      <div class="code-fence-highlighter-copy-button" data-fence-content="c3NoIGJ1cnN0">
+  
+       <img class="code-fence-highlighter-copy-button-icon">
+
+      </div><code class="language-bash" md-src-pos="1304..1333"><a class="run-icon hidden code-block" href="#" role="button" data-command="Run:5eaadc071b23b0a38231c44b00d9b5f1" data-commandtype="block"><img src="http://localhost:63342/4f800f8a-bbed-4dd8-b03c-00449c9f6698/1926695178/runrun.png?_ijt=cneq5lh4t6clt5j0q9u2d98bls"></a><span md-src-pos="1304..1312"></span><span md-src-pos="1312..1322">ssh burst</span>
+<span md-src-pos="1322..1323"></span><span md-src-pos="1326..1333"></span></code></pre></li>
+   </ul>
+   <ol start="2" md-src-pos="1335..1368">
+    <li md-src-pos="1335..1368"><strong md-src-pos="1338..1366">Confirm Successful Login</strong>: </li>
+   </ol>
+   <ul md-src-pos="1369..1464">
+    <li md-src-pos="1369..1464">If successful, your terminal prompt will change to something like <code md-src-pos="1439..1463">[&lt;NetID&gt;@log-burst ~]$</code>.</li>
+   </ul>
+   <h2 md-src-pos="1466..1496">Part 3: Exploring the Burst</h2>
+   <h3 md-src-pos="1498..1539">How to Run a CPU-only Interactive Job</h3>
+   <ul md-src-pos="1540..1945">
+    <li md-src-pos="1540..1802">Execute the following command to initiate a simple CPU-only interactive job that lasts for 4 hours:<pre class="code-fence" md-src-pos="1644..1802">
+      <div class="code-fence-highlighter-copy-button" data-fence-content="c3J1biAtLWFjY291bnQ9ZHNfZ2FfMTAxMS0yMDIzZmEgLS1wYXJ0aXRpb249aW50ZXJhY3RpdmUgLS10aW1lPTA0OjAwOjAwIC0tcHR5IC9iaW4vYmFzaAojIEl0IG1heSB0YWtlIGEgZmV3IG1pbnV0ZXMgc28gcGxlYXNlIGJlIHBhdGllbnQgOik=">
+  
+       <img class="code-fence-highlighter-copy-button-icon">
+
+      </div><code class="language-bash" md-src-pos="1644..1802"><a class="run-icon hidden code-block" href="#" role="button" data-command="Run:2d78c2a4ae364238f5d1cc5b75a42ea7" data-commandtype="block"><img src="http://localhost:63342/4f800f8a-bbed-4dd8-b03c-00449c9f6698/1926695178/runrun.png?_ijt=cneq5lh4t6clt5j0q9u2d98bls"></a><span md-src-pos="1644..1652"></span><span md-src-pos="1652..1741">srun --account=ds_ga_1011-2023fa --partition=interactive --time=04:00:00 --pty /bin/bash</span>
+<span md-src-pos="1741..1793"><span style="color: rgb(150, 152, 150);"># It may take a few minutes so please be patient :)</span></span>
+<span md-src-pos="1793..1794"></span><span md-src-pos="1797..1802"></span></code></pre></li>
+    <li md-src-pos="1803..1870">Your terminal prompt should change to something like <code md-src-pos="1858..1869">bash-4.4$</code>.</li>
+    <li md-src-pos="1871..1945">To exit the job and return to your regular terminal, simply type <code md-src-pos="1938..1944">exit</code>.</li>
+   </ul>
+   <h3 md-src-pos="1947..1987">How to Run a GPU Job with 1 V100 GPU</h3>
+   <ul md-src-pos="1988..2247">
+    <li md-src-pos="1988..2247">To launch a GPU job that utilizes one V100 GPU and lasts for 4 hours, execute:<pre class="code-fence" md-src-pos="2071..2247">
+      <div class="code-fence-highlighter-copy-button" data-fence-content="c3J1biAtLWFjY291bnQ9ZHNfZ2FfMTAxMS0yMDIzZmEgLS1wYXJ0aXRpb249bjFzOC12MTAwLTEgLS1ncmVzPWdwdTp2MTAwOjEgLS10aW1lPTA0OjAwOjAwIC0tcHR5IC9iaW4vYmFzaAojIEl0IG1heSB0YWtlIGEgZmV3IG1pbnV0ZXMgc28gcGxlYXNlIGJlIHBhdGllbnQgOik=">
+  
+       <img class="code-fence-highlighter-copy-button-icon">
+
+      </div><code class="language-bash" md-src-pos="2071..2247"><a class="run-icon hidden code-block" href="#" role="button" data-command="Run:671ab50d3a202b47269e2bb978230ad7" data-commandtype="block"><img src="http://localhost:63342/4f800f8a-bbed-4dd8-b03c-00449c9f6698/1926695178/runrun.png?_ijt=cneq5lh4t6clt5j0q9u2d98bls"></a><span md-src-pos="2071..2079"></span><span md-src-pos="2079..2186">srun --account=ds_ga_1011-2023fa --partition=n1s8-v100-1 --gres=gpu:v100:1 --time=04:00:00 --pty /bin/bash</span>
+<span md-src-pos="2186..2238"><span style="color: rgb(150, 152, 150);"># It may take a few minutes so please be patient :)</span></span>
+<span md-src-pos="2238..2239"></span><span md-src-pos="2242..2247"></span></code></pre></li>
+   </ul>
+   <hr>
+   <p md-src-pos="2254..2341"><span md-src-pos="2254..2341">Feel free to reach out to the course staff for any further questions or clarifications.</span></p>
+  </div>
+ </body>
+</html>
