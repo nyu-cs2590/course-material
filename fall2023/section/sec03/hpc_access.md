@@ -43,7 +43,7 @@ This tutorial guides you through the steps to confirm that you can successfully 
 - Execute the following command to initiate a simple CPU-only interactive job that lasts for 4 hours:
   ```bash
   srun --account=ds_ga_1011-2023fa --partition=interactive --time=04:00:00 --pty /bin/bash
-  # It may take a few minutes so please be patient :)
+         # It may take a few minutes so please be patient :)
   ```
 - Your terminal prompt should change to something like `bash-4.4$`.
 - To exit the job and return to your regular terminal, simply type `exit`.
@@ -52,7 +52,7 @@ This tutorial guides you through the steps to confirm that you can successfully 
 - To launch a GPU job that utilizes one V100 GPU and lasts for 4 hours, execute:
   ```bash
   srun --account=ds_ga_1011-2023fa --partition=n1s8-v100-1 --gres=gpu:v100:1 --time=04:00:00 --pty /bin/bash
-  # It may take a few minutes so please be patient :)
+         # It may take a few minutes so please be patient :)
   ```
 
 ---
