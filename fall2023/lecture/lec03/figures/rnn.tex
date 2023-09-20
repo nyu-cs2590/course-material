@@ -1,0 +1,39 @@
+\documentclass[crop,tikz]{standalone}
+\usepackage{amstext}
+\usepackage{amssymb}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shapes.misc}
+
+\begin{document}
+
+\include{style}
+
+\begin{tikzpicture}
+
+\node (h0) [vector={red}] at(0,0) {$h_0$};
+
+\foreach \i/\x in {1/a,2/good,3/book}{
+    \pgfmathtruncatemacro\j{\i-1}
+    \node (h\i) [vector] [right=2cm of h\j] {$f_{\text{state}}$};
+    %\node (i\i) [vector] [below=1.5cm of h\i] {$W_e\phi_{\text{one-hot}}(x)$};
+    \node (i\i) [vector] [below=1.5cm of h\i] {$f_{\text{embed}}$};
+    \node (t\i) [vector={red}] [below=1.5cm of i\i] {$\x$};
+    %\node (o\i) [vector] [above=1.5cm of h\i] {$W_{ho}x+b_{ho}$};
+    \node (o\i) [vector] [above=1.5cm of h\i] {$f_{\text{output}}$};
+    \node (o2\i) [above=1.5cm of o\i] {};
+    \path [arrow] (t\i) -- node [right] {} (i\i);
+    \path [arrow] (i\i) -- node [right] {$x_\i$} (h\i);
+    \path [arrow] (h\i) -- node [right] {$h_\i$} (o\i);
+    \path [arrow] (o\i) -- node [right] {$o_\i$} (o2\i);
+}
+
+\node (h4) [right=2cm of h3] {$\ldots$};
+
+\foreach \i in {1,...,3}{
+    \pgfmathtruncatemacro\j{\i+1}
+    \path [arrow] (h\i) -- node [above] {$h_\i$} (h\j);
+}
+\path [arrow] (h0) -- node [above] {} (h1);
+
+\end{tikzpicture}
+\end{document}
