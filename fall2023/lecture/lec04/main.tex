@@ -382,6 +382,16 @@
         \includegraphics[height=4cm]{figures/beam-search}
     \end{figure}
     \vspace{-1em}
+    \pdfnote{
+        At each step, we want to find the partial sequence with the highest score.
+        At the end, we would have the highest scoring complete sequence.
+        But isn't this more expensive?
+        We need to use DP here by reusing previous result.
+        By chain rule, at each step, we can reuse previous compute.
+        But still, this isn't saving us much compute, because we are still enumerating the score of all sequences.
+        The main trick in beam search is to reduce the search space at each step to a constant number, i.e. the beam size.
+        Basically, we only save the top-k partial sequences at each step.
+    }
 
     \begin{itemize}
         \item At each step, rank symbols by log probability of the partial sequence
