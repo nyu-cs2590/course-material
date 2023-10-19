@@ -17,10 +17,10 @@ result in point deduction or grading error.
    Upon successful submission, you will receive an email of your own response.
    If you need to change the response, you can go back to the form and edit before the submission deadline.
 
-3. **Download the project** proposal latex template. You can open the zip file using overleaf or other latex editor.
+3. **Download the project** proposal latex [template](https://github.com/nyu-cs2590/course-material/blob/gh-pages/fall2023/project/DS-GA-1011%20proposal%20template.zip). You can open the zip file using overleaf or other latex editor.
    Please complete your project proposal based on the provided template. 
 
-4. Submit the proposal on Gradescope.
+4. [Submit](https://www.gradescope.com/courses/603783/assignments/3550332) the proposal on Gradescope.
   You should submit the pdf compiled using latex **as a group**. 
   Following the previous example, suppose Bob is responsible for proposal submission, then Ana and Carly **should not re-submit**.
 
