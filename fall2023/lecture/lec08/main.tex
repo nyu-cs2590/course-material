@@ -1,0 +1,730 @@
+\documentclass[usenames,dvipsnames,notes,11pt,aspectratio=169,hyperref={colorlinks=true, linkcolor=blue}]{beamer}
+\usepackage{ifthen}
+\usepackage{xcolor}
+\usepackage{pgfplots}
+\usepackage{amsmath}
+\usepackage{centernot}
+\usepackage{pifont}
+\usepackage{tabularx}
+\usepackage{makecell}
+\usepackage{cuted}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage{setspace}
+\usepackage{xspace}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{pdfcomment}
+%\newcommand{\pdfnote}[1]{\marginnote{\pdfcomment[icon=note]{#1}}}
+\newcommand{\pdfnote}[1]{}
+
+\usepackage{pgfpages}
+%\setbeameroption{show notes on second screen}
+
+
+\input ../beamer-style
+\input ../std-macros
+\input ../macros
+
+\newcommand{\pt}{\partial}
+
+\AtBeginSection[]
+{
+    \begin{frame}
+        \frametitle{Table of Contents}
+        \tableofcontents[currentsection]
+    \end{frame}
+}
+\parskip=10pt
+
+\title[DS-GA.1011]{Holistic Evaluation}
+\author[He He]{He He
+}
+\institute[NYU]{
+    \includegraphics[height=1cm]{../figures/nyu-logo}\\
+}
+\date{October 25, 2023}
+
+\begin{document}
+\begin{frame}
+\titlepage
+\end{frame}
+
+%\begin{frame}
+%    {Logistics}
+%    \begin{itemize}
+%        \item Midterm 
+%        \item Proposal 
+%    \end{itemize}
+%\end{frame}
+
+\section{Introduction}
+
+\begin{frame}
+    {Influence of benchmarks in AI}
+
+    \begin{columns}
+        \begin{column}{0.4\textwidth}
+            \includegraphics[width=\textwidth]{figures/hill-climbing}
+        \end{column}
+        \begin{column}{0.6\textwidth}
+            \begin{itemize}
+                \item Machine learning drives the progress.
+                \item Benchmarks set the direction.
+                \item Key questions answered by a benchmark:
+                    \begin{itemize}
+                        \item What tasks are \blue{important} and \blue{within reach} now?
+                        \item Where do we stand now?
+                    \end{itemize}
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    {Example: ImageNet [Deng et al., 2009]}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \includegraphics[width=\textwidth]{figures/imagenet}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{itemize}
+                \item Over 14M labeled images
+                \item Data collection leveraged \blue{image search} and \blue{crowdsourcing} (Amazon Mechanical Turk ) \\
+                    {\it scale over precision}
+                \item Led to the community-wide ILSVRC challenge
+                \item The message:\\
+                    \textit{Let's learn from lots of data!}
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    {Breakthrough of deep learning established by ImageNet}
+    \begin{figure}
+    \includegraphics[height=0.6\textheight]{figures/imagenet-progress}
+        \caption{From Fei-Fei Li's \href{https://www.image-net.org/static_files/files/imagenet_ilsvrc2017_v1.0.pdf}{slides}}
+    \end{figure}
+    \vspace{-1em}
+    \begin{itemize}
+        \item AlexNet \mycite{Krizhevsky et al., 2012} achieved top-1 error rate in ILSVRC 2010.
+        \item The result sparked renewed interests in neural netowrks.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Example: GLUE [Wang et al., 2019]}
+    \begin{figure}
+    \includegraphics[height=0.6\textheight]{figures/glue}
+    \end{figure}
+    \vspace{-1em}
+    \begin{itemize}
+        \item A collection of selected NLU datasets 
+        \item BERT suceeded by achieving 7.7 point improvement on GLUE
+        \item The message: \textit{Let's build general NLU models that adapt to many tasks}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Evaluating models beyond accuracy}
+
+    \begin{figure}
+        \includegraphics[width=\textwidth]{figures/glue-top1}\\[1ex]
+        ...\\[1ex]
+    \includegraphics[width=\textwidth]{figures/glue-human}
+    \end{figure}
+
+    \begin{itemize}
+        \item Accuracy is the most basic characterization of a model's task ability.
+        \item But it focuses on a single aspect and is easily saturated by current models.
+        \item What other aspects of model performance do we care about? 
+    \end{itemize}
+    \pause
+    {\bf Plan for today}: evaluating model performance {\it along different axes}
+\end{frame}
+
+\begin{frame}
+    {What properties are desirable?}
+
+    Linguists, cognitive scientists: \textbf{interpretability}\\
+    \begin{itemize}
+        \item How does the model make predictions? Is it human-like?
+    \end{itemize}
+    \pause
+
+    Practitioners: \textbf{efficiency}, \textbf{robustness}\\
+    \begin{itemize}
+        \item How much resource does it take for training and inference?
+        \item Does it handle typos/dialects/etc. well?
+    \end{itemize}
+    \pause
+
+    Product managers: \textbf{calibration}, \textbf{explainability}\\
+    \begin{itemize}
+        \item Can the model indicate its uncertainty about a prediction? 
+        \item Can it explain its predictions?
+    \end{itemize}
+    \pause
+
+    Policymakers: \textbf{fairness}, \textbf{privacy}\\
+    \begin{itemize}
+        \item Does the model put certain groups at disadvantage?
+        \item Does it protect user privacy?
+    \end{itemize}
+\end{frame}
+
+\section{Robustness}
+
+\begin{frame}
+    {Robustness}
+
+    Our standard setting assumes that the training and test examples are \textbf{independent and identically distributed} (iid).
+
+    However, this is almost never true in practice. (examples?)
+    \pause
+
+    Reasons for {\bf distribution shifts}:\\
+    \begin{itemize}
+        \item Limited training data coverage (often causes domain shift)
+            \begin{itemize}
+                \item movie reivew $\rightarrow$ book review, hospital 1 $\rightarrow$ hospital 2
+            \end{itemize}
+        \item Temporal change (often causes label shift)
+            \begin{itemize}
+        \item fever/flu  $\rightarrow$ fever/COVID
+        \item the US president is ?
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Evaluating robustness}
+
+    \textbf{Challenge}: difficult to come up with a general notion of robustness\\
+    \begin{itemize}
+        \item What are non-iid user inputs that are interesting? 
+        \item How do we obtain these inputs?
+        \item The answer is often task-dependent.
+    \end{itemize}
+    \pause
+
+    Different types of robustness:\\
+    \begin{itemize}
+        \item Robustness to \textbf{adversarial examples} that are designed to fool the model
+        \item Robustness to \textbf{perturbation} of iid examples
+        \item and many more!
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Adversarial robustness}
+    Adversarial examples in image recognition:
+    \begin{figure}
+        \includegraphics[height=3cm]{figures/advex}
+    \end{figure}
+    \begin{itemize}
+        \item Find minimal $\Delta x$ that maximizes $L(x+\Delta x, y)$ 
+        \item Solve an optimization problem (where $\Delta x$ is the parameter)
+    \end{itemize}
+    \think{What are challenges of doing this in NLP?}
+    \pdfnote{discrete space, change the label. therefore need heuristics and human efforts}
+\end{frame}
+
+\begin{frame}
+    {Adversarial examples in NLP}
+
+    Adversarial examples for reading comprehension \mycite[https://arxiv.org/pdf/1707.07328.pdf]{[Jia et al., 2017]}
+
+    {\bf Goal}: perturb the paragraph+question to change the model's prediction but not the groundtruth 
+    \medskip
+    \begin{columns}
+        \begin{column}{0.4\textwidth}
+            \includegraphics[width=\textwidth]{figures/advqa}
+        \end{column}
+        \begin{column}{0.6\textwidth}
+            \begin{itemize}
+                \item How to make sure the groundtruth doesn't change?
+                    \pause
+                    \begin{itemize}
+                \item Add a \textbf{distractor} sentence to the paragraph
+                    \end{itemize}
+                \item How to make sure the distractor sentence changes the model prediction?\pause
+                    \begin{itemize}
+                        \item Trial and error
+                        \item Make it similar to the answer sentence
+                    \end{itemize}
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    {Adversarial examples in NLP}
+
+    \begin{figure}
+    \includegraphics[width=0.75\textwidth]{figures/advqa-approach}
+    \end{figure}
+    \vspace{-1em}
+    \begin{itemize}
+        \item What are potential defense strategies to AddAny?\pause
+        \item What are possible reasons for the model to make mistakes on AddSent?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Adversarial examples in NLP}
+
+    ANLI \mycite[https://arxiv.org/pdf/1910.14599.pdf]{[Nie et al., 2020]}: collect adversarial examples by model-in-the-loop crowdsourcing
+
+    Main idea: iteratively find and train on misclassified/hard examples\vspace{-1em}
+    \begin{figure}
+        \includegraphics[width=0.9\textwidth]{figures/anli}
+    \end{figure}
+
+    {What are potential pitfalls of this benchmarking strategy?}
+\end{frame}
+
+\begin{frame}
+    {Text perturbations}
+
+    Perturbations: small edits to the input text
+
+    \textbf{Label-perserving} perturbations: can often be automated\\
+    \begin{itemize}
+        \item Typos: the table is sturdy $\rightarrow$ the tabel is sturdy
+        \item Capitalization: the table is sturdy $\rightarrow$ The table is sturdy
+        \item Synonym substitution: the table is sturdy $\rightarrow$ The table is solid 
+    \end{itemize}
+    \pause
+
+    \textbf{Label-changing} perturbations: needs human work\\
+    \begin{itemize}
+        \item Example:   the table is sturdy $\rightarrow$ the table is shaky (sentiment) 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Behaviorial testing of NLP models}
+    \begin{columns}
+        \begin{column}{0.41\textwidth}
+            \includegraphics[width=0.9\textwidth]{figures/checklist}
+        \end{column}
+        \begin{column}{0.59\textwidth}
+            Checklist \mycite[https://arxiv.org/pdf/2005.04118.pdf]{[Ribeiro et al., 2020]}
+            \begin{itemize}
+                \item Inspired by unit tests in software engineering  
+                \item Minimum functionality test: simple test cases focus on a capability
+                \item Invariance test: label-perserving edits (e.g., change entities in sentiment tasks)
+                \item Directional expectation test: label-changing edits
+            \end{itemize}
+            \pause
+            \textbf{Key challenge}: how to scale this?\\
+            \begin{itemize}
+                \item Templates, automatic fill-ins, open-source community 
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    {Open-source efforts: user-contributed transformations of text}
+    \begin{figure}
+        \includegraphics[width=0.8\textwidth]{figures/nl-augmenter}
+        \caption{\url{https://github.com/GEM-benchmark/NL-Augmenter}}
+    \end{figure}
+    \vspace{-2em}
+        Contribute your solution in HW3!
+\end{frame}
+
+\begin{frame}
+    {Summary}
+
+    \begin{itemize}
+        \item Robustness measures model performance \blue{under distribution shifts}.
+        \item But there is no agreement on the target distribution of interest.
+            \begin{itemize}
+                \item Transformations of iid inputs
+                \item Inputs from another domain (domain adaptation)
+                \item Inputs with different styles (spoken, social media text)
+                \item ...
+            \end{itemize}
+            \pause
+        \item The main challenges are
+            \begin{itemize}
+                \item Understand what target distribution is of interest.
+                \item Curate or generate these examples at scale. 
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\section{Calibration}
+
+\begin{frame}
+    {Calibration}
+
+    In high-stake settings (e.g., healthcare), we want to know how \textbf{uncertain} the model prediction is. (Why?) \\\pause
+    \begin{itemize}
+        \item Inform human decision making
+        \item Avoid making incorrect predictions (improving precision)
+    \end{itemize}
+
+    \pause
+    Problem setting:\\
+    \begin{itemize}
+        \item Model outputs a confidence score (high confidence $\rightarrow$ low uncertainty)
+        \item Given the confidence scores, the prediction and the groundtruth, measure how \textbf{calibrated} the model is.
+            \begin{itemize}
+                \item Does the confidence score correspond to likelihood of a correct prediction?
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Defining calibration}
+
+    We can directly take the model output $p_\theta(\hat{y}\mid x)$ where $\hat{y} = \argmax_y p_\theta(y\mid x)$ as the confidence score.
+
+    How good is the confidence score?\pause
+
+    A \textbf{perfectly-calibrated} model should output confidence scores that are equal to the probability that the prediction is correct.
+
+    \textbf{Example}: if the model predicts 1000 sentences as having positive sentiment with a probability of 0.8, then 800 of these predictions are correct.\pause
+    $$
+    \BP(\text{prediction}=\text{groundtruth} \mid \text{confidence}=p) = p, \quad \forall p\in[0,1]
+    $$
+
+    \pause
+    \textbf{Challenge}: need to operationalize the definition into some calibration error that can be estimated on a finite sample
+\end{frame}
+
+\begin{frame}
+    {Expected calibration error (ECE) \mycite{[Naeini et al., 2015]}} 
+
+    Main idea: ``discretize'' the confidence score
+
+    Partitioning predictions into $M$ equally-spaced bins $B_1,\ldots, B_M$ by their confidence score.\pause
+    $$
+    \text{ECE} = \sum_{m=1}^M \frac{|B_m|}{n}
+    \left \vert\text{accuracy}(B_m) - \text{confidence}(B_m)\right\vert 
+    $$
+
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \includegraphics[width=\textwidth]{figures/nn-calibration}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{itemize}
+                \item Modern neural networks are poorly calibrated \href{https://arxiv.org/pdf/1706.04599.pdf}{[Gao et al., 2017]}
+                \item Left: 5 layer LeNet
+                \item Right: 110 layer ResNet
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    {ECE calculation example}
+
+    Practicalities:\\
+    \begin{itemize}
+        \item Number of bins can have large impact on the calculated ECE\pause
+        \item Some bins may contain very few examples 
+        \item Equally sized bins are also used in practice
+    \end{itemize}
+
+    \vspace{-1em}
+    \begin{figure}
+        \includegraphics[height=4cm]{figures/ece-calc}
+        \caption{From \href{https://arxiv.org/pdf/2211.09110.pdf}{HELM}}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    {Selective classification}
+    How can we use the confidence score?\\
+    \begin{itemize}
+    \item Abstain (not predicting) on examples with low confidence
+        \item Optionally ask for human help
+    \end{itemize}
+
+    \pause
+    Concept check: given a perfectly calibrated model, if we abstain on examples whose confidence score is below 0.8, what's the accuracy we will get?
+
+    \pause
+    \textbf{Accuracy-coverage trade-off}:\\
+    \begin{itemize}
+    \item Accuracy can be improved by raising the confidence threshold
+    \item But coverage (fraction of examples where we make a prediction) is reduced with increasing threshold
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Selective classification metrics}
+
+    \textbf{Accuracy at a specific coverage}
+    \begin{figure}
+        \includegraphics[width=\textwidth]{figures/sel-class}
+        \caption{From \href{https://arxiv.org/pdf/2211.09110.pdf}{HELM}}
+    \end{figure}
+    \pause
+
+    \textbf{Area under the accuracy-coverage curve}: average accuracy at different coverage
+
+    \pause
+    If a model has high accuracy at 0.8 coverage, does that mean it's well calibrated?
+\end{frame}
+
+\begin{frame}
+    {Summary}
+
+    \begin{itemize}
+        \item Calibration measures whether models can \blue{quantify the uncertain of its output}.
+        \item This is critical in high-stake decision-making and human-machine collaboration scenarios.
+            \pause
+        \item Good metrics for classification tasks: ECE, accuracy-coverage trade-off.
+        \item Future challenges:\\
+            \begin{itemize}
+                \item How to measure calibration for sequence generation tasks?
+                \item How to measure uncertainty expressed in natural language?
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\section{Fairness}
+
+\begin{frame}
+    {Fairness and bias}
+
+    Fairness problems can be reflected in multiple ways:\\
+    \begin{itemize}
+        \item {\bf Performance disparities}: the model performs better for some groups and worse for others, e.g., lower accuracy for african american english
+        \item {\bf Social biases and stereotypes}: systematically associate certain concept with some groups, e.g., computer scientists and male
+    \end{itemize}
+
+    \pause
+    Human has the same bias. Why is this a problem?\pause
+
+    What groups are of interest?\\\pause
+    \begin{itemize}
+        \item {\bf Protected attributes}, i.e.\ demographic features that may not be used as the basis for decisions such as race, gender, sexual orientation.
+    \end{itemize}
+
+    Challenge: how to identify the groups (typically not revealed) from text?
+\end{frame}
+
+\begin{frame}
+    {Performance disparities}
+
+    \begin{figure}
+        \includegraphics[width=\textwidth]{figures/name-completion}
+        \caption{\mycite[https://aclanthology.org/2020.emnlp-main.556.pdf]{[Shwartz et al., 2020]}}
+    \end{figure}
+    \vspace{-1em}
+    Models associate names with famous names from news.
+\end{frame}
+
+\begin{frame}
+    {Performance disparities}
+    \begin{figure}
+        \includegraphics[height=0.6\textheight]{figures/name-disparity}
+        \caption{\mycite[https://aclanthology.org/2020.emnlp-main.556.pdf]{[Shwartz et al., 2020]}}
+    \end{figure}
+    \vspace{-1em}
+    Model has performance gap for certain names when they appear in NAME1 vs NAME2.
+\end{frame}
+
+\begin{frame}
+    {Fairness and bias metrics}
+    \textbf{Performance disparities}: the model should have similar performance across different groups, e.g., variance across group accuracies\\
+
+    Requires annotation on the group(s) each example belongs to:\\
+    \begin{itemize}
+        \item Properties of the \textbf{speaker}:
+    \begin{itemize}
+        \item spoken vs written languages, dialects
+    \end{itemize}
+            \pause
+    \item Properties of the \textbf{content}:
+    \begin{itemize}
+        \item gender, sex, race
+        \item nationtionality, religion
+    \end{itemize}
+    \end{itemize}
+
+    \pause
+    Potential concerns of this metric?\\
+    \begin{itemize}
+        \item Group vs individual fairness
+        \item Optimal performance of different groups may not be similar
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+    {Stereotypes}
+    Model predictions may be biased towards a specific social group\vspace{-1em}
+    \begin{figure}
+        \includegraphics[width=0.9\textwidth]{figures/visual-gender}
+        \caption{From \mycite[https://arxiv.org/pdf/1707.09457.pdf]{[Zhao et al., 2017]}}
+    \end{figure}
+    \vspace{-2em}
+    \begin{itemize}
+        \item Visual semantic role labeling: predict each role given an image
+        \item \textbf{Amplification} through the model:
+            \begin{itemize}
+                \item Cooking is about 33\% more likely to involve females than males
+                \item But the model predicts woman 68\% more likely than man
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Fairness and bias metrics}
+    What's would be a non-stereotypical model?\pause %$\quad$ The definition of fairness is debatable.
+
+    \pause
+    \textbf{Counterfactual fairness}: the model should produce the same prediction when the group is changed in the data (all else being equal)\\
+    \begin{figure}
+        \includegraphics[width=0.9\textwidth]{figures/counterfactual-fairness}
+        \caption{From \href{https://arxiv.org/pdf/2211.09110.pdf}{HELM}}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    {Fairness and bias benchmarks}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{figure}
+            \includegraphics[width=\textwidth]{figures/bbq}
+            \caption{From \href{https://arxiv.org/pdf/2110.08193.pdf}{BBQ dataset }}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            BBQ dataset:
+            \begin{itemize}
+                \item Does the model have a systematic bias given insufficient evidence? 
+                \item Does the model changes its prediction given additional evidence? 
+            \end{itemize}
+            Counterfactual data:
+            \begin{itemize}
+                \item Sometimes can be automatically created, e.g., flipping gender.
+                \item But often requires human efforts to make sure the context is controlled.
+            \end{itemize}
+        \end{column}
+        \end{columns}
+\end{frame}
+
+\begin{frame}
+    {Fairness and bias benchmarks}
+    Covers many different types of biases\\
+    \begin{figure}
+            \includegraphics[height=0.8\textheight]{figures/bbq-cov}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    {Summary}
+    \begin{itemize}
+        \item Fairness issues in pretrained models will directly influence downstream performance
+        \item Challenging to define fairness (definition may be problem-dependent)
+        \item Many metrics rely on the principle of invariance
+        \item Trade-off between fairness and accuracy?
+        \item Requires interdisciplinary efforts!
+    \end{itemize}
+\end{frame}
+
+\section{Privacy}
+
+\begin{frame}
+    {Privacy}
+
+    Models are now trained on large quantities of \textit{public} internet data.
+
+    What could be the privacy concerns?\\\pause
+    \begin{itemize}[<+->]
+        \item Private data can be leaked to the internet
+        \item Private data can be inferred by linking multiple public data sources
+        \item Private data can be predicted from public information
+        \item Sensitive public information can be shared more widely out of the intended context
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Can we extracting sensitive data from models?}
+    Models can generate its training data verbatim \href{https://arxiv.org/pdf/2012.07805.pdf}{[Carlini et al., 2021]}:\vspace{-2em}
+    %\begin{columns}
+    %    \begin{column}{0.5\textwidth}
+    %        \begin{figure}
+    %        \includegraphics[width=0.9\textwidth]{figures/mem-gpt2}
+    %        \end{figure}
+    %    \end{column}
+    %    \begin{column}{0.5\textwidth}
+    %        \begin{figure}
+    %        \includegraphics[width=\textwidth]{figures/mem-gpt2-string}
+    %        \end{figure}
+    %    \end{column}
+    %    \end{columns}
+            \begin{figure}
+            \includegraphics[height=0.5\textheight]{figures/mem-gpt2}
+            \includegraphics[width=0.9\textwidth]{figures/peter}
+            \end{figure}
+\end{frame}
+
+\begin{frame}
+    {How to extract memorized data from models?}
+            \begin{figure}
+            \includegraphics[width=0.8\textwidth]{figures/mem-gpt2-method}
+            \end{figure}
+            \vspace{-2em}
+
+            How to find potentially memorized text?\\
+            \begin{itemize}
+                \item Direct sampling would produce common text (e.g., I don't know)
+            \pause
+                \item \textbf{Key idea}: compare to a second model; text is `interesting' if its likelihood is only high under the original model.
+                    \begin{itemize}
+                        \item likelihood under a smaller model 
+                        \item zlib compression entropy (effective at removing repeated strings)
+                        \item likelihood of lowercased text 
+                    \end{itemize}
+            \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {What kind of data can be extracted?}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{figure}
+            \includegraphics[width=\textwidth]{figures/mem-data}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            Repeated data is more likely to be extracted:
+            \begin{figure}
+            \includegraphics[width=\textwidth]{figures/mem-gpt2-string}
+            \end{figure}
+        \end{column}
+        \end{columns}
+\end{frame}
+
+\begin{frame}
+    {Summary}
+    \begin{itemize}
+        \item Privacy: the user has the right to be left out
+        \item Highly relevant when training on internet-scale data
+            \begin{itemize}
+                \item Memorizing copyrighted text, e.g., books, code
+                \item Memorizing personally identifiable information
+            \end{itemize}
+        \item Lots of open questions:
+            \begin{itemize}
+                \item What kind of data is considered private / sensitive?
+                \item Definition of privacy (DP, verbatim memorization...)
+                \item How to unlearn a user's data after training on it? 
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\end{document}
