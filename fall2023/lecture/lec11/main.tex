@@ -1,0 +1,725 @@
+\documentclass[usenames,dvipsnames,notes,11pt,aspectratio=169,hyperref={colorlinks=true, linkcolor=blue}]{beamer}
+\usepackage{ifthen}
+\usepackage{xcolor}
+\usepackage{pgfplots}
+\usepackage{amsmath}
+\usepackage{centernot}
+\usepackage{pifont}
+\usepackage{tabularx}
+\usepackage{makecell}
+\usepackage{cuted}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage{setspace}
+\usepackage{xspace}
+\usepackage{subcaption}
+\usepackage{mdframed}
+\usepackage{tikz}
+\usepackage{pdfcomment}
+%\newcommand{\pdfnote}[1]{\marginnote{\pdfcomment[icon=note]{#1}}}
+\newcommand{\pdfnote}[1]{}
+
+\usepackage{pgfpages}
+%\setbeameroption{show notes on second screen}
+
+
+\input ../beamer-style
+\input ../std-macros
+\input ../macros
+
+\newcommand{\pt}{\partial}
+
+\AtBeginSection[]
+{
+    \begin{frame}
+        \frametitle{Table of Contents}
+        \tableofcontents[currentsection]
+    \end{frame}
+}
+\parskip=10pt
+
+\title[DS-GA.1011]{Aligning language models}
+\author[He He]{He He
+}
+\institute[NYU]{
+    \includegraphics[height=1cm]{../figures/nyu-logo}\\
+}
+\date{November 15, 2023}
+
+\begin{document}
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}
+    {What is alignment}
+
+    The \blue{technical} problem: how to adapt the language model to the intended task (which is not language modeling) 
+
+    \bigskip
+    \begin{columns}
+        \begin{column}{0.4\textwidth}
+        \includegraphics[width=\textwidth]{figures/prompt}
+        \end{column}
+        \begin{column}{0.6\textwidth}
+            \begin{itemize}
+                \item Prompting converts a task to a native LM task
+                \item But model performance is sensitive to prompts \\
+                        \textit{Prompting is more of an art than science}
+                \item Goal: make LMs the best assistant to humans 
+                \item So that we can \blue{just ask the model to do any task}
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    {What is alignment}
+
+    The \blue{ethical} problem: what the model should and should not do 
+
+    \bigskip
+    \begin{columns}
+        \begin{column}{0.4\textwidth}
+        \includegraphics[width=0.9\textwidth]{figures/two-ais}
+        \end{column}
+        \begin{column}{0.6\textwidth}
+            \begin{itemize}
+                \item AI is neither friendly nor hostile to humans 
+                \item But it could unintentionally harm humans\\
+                        \textit{They just don't care}
+                    \item Goal: make sure that they only perform tasks that \blue{benefit humans}, e.g.,
+                    \begin{itemize}
+                        \item Don't harm others to achieve a goal 
+                        \item Be polite and respectful
+                        \item Don't teach people to commit crimes 
+                    \end{itemize}
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    {Capability vs alignment}
+
+    \vspace{1em}
+        \begin{columns}
+        \begin{column}{0.3\textwidth}
+        \includegraphics[width=0.9\textwidth]{figures/tools}
+        \end{column}
+        \begin{column}{0.7\textwidth}
+    \textbf{Capability}: What things is the model \emph{able} to do?\\
+    \begin{itemize}
+        \item Write news articles
+        \item Provide information on various subjects
+        \item Build softwares and websites
+    \end{itemize}
+            \blue{Do things that humans are able to do}
+        \end{column}
+        \end{columns}
+
+        \pause
+        \begin{columns}
+        \begin{column}{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figures/choice}
+        \end{column}
+        \begin{column}{0.7\textwidth}
+    \textbf{Alignment}: What things does the model \emph{choose} to do?
+    \begin{itemize}
+        \item Provide truthful information and express uncertainty 
+        \item Be careful with potentially harmful information  
+        \item Clarify user intentions and preferences 
+    \end{itemize}
+            \blue{Align with human values}
+        \end{column}
+        \end{columns}
+\end{frame}
+
+\begin{frame}
+    {Challenges in alignment: objective}
+
+    \textbf{Implicit rules}: \blue{not articulated} but assumed in human interaction
+
+    Example:\\
+    \begin{itemize}
+        \item Explicit task: answer questions on topic X
+        \item Implicit rules:
+            \begin{itemize}
+                \item Don't make up stuff
+                \item Don't use toxic language
+                \item Don't give information that's potentially harmful
+            \end{itemize}
+    \end{itemize}
+
+    \pause
+    The implicit rules may be \blue{context dependent}:\\
+    \begin{itemize}
+        \item Translation: what if the source text is toxic?
+        \item Summarization: what if the source article contains untruthful information?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Challenges in alignment: objective}
+
+    \textbf{Oversight}: provide supervision on alignment\\
+    \begin{itemize}
+        \item One obvious way to align models is to train them on supervised data (later)
+        \item But how can we supervise models on tasks that \blue{beyond human capabilities}?
+    \end{itemize}
+    \vspace{-1em}
+
+    \begin{figure}
+        \includegraphics[height=0.5\textheight]{figures/oversight}
+        \caption{From \href{https://arxiv.org/pdf/2211.03540.pdf}{[Bowman et al., 2022]}}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    {Challenges in alignment: objective}
+    
+    \textbf{Diversity}: whose values should the model be aligned with?\\
+    \begin{itemize}
+        \item Different  groups (cultural/ethnic/gender/religious/etc.) agree with different answers to the same question
+    \end{itemize}
+
+    \begin{figure}
+        \includegraphics[width=\textwidth]{figures/opinionqa}
+        \caption{From \href{https://arxiv.org/pdf/2303.17548.pdf}{[Santurkar et al., 2023]}}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    {Challenges in alignment: objective}
+
+    Finetuning shifts LM's opinion
+    \vspace{-1.5em}
+
+    \begin{figure}
+        \includegraphics[height=0.7\textheight]{figures/opinionqa-result}
+        \caption{From \href{https://arxiv.org/pdf/2303.17548.pdf}{[Santurkar et al., 2023]}}
+    \end{figure}
+\end{frame}
+
+
+\begin{frame}
+    {Challenges in alignment: methods}
+
+    Insufficient scientific understanding of LLMs, e.g., \\
+    \begin{itemize}
+        \item How does in-context learning (which underlies many other capabilities such as CoT) work?
+        \item Can LLMs reason, and if so, where did they acquire the capability?
+        \item Can we predict emergent capabilities from scaling?
+        \item How does finetuning change the pretrained model?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Current approaches to alignment}
+    \begin{itemize}
+        \itemsep1em
+        \item \textbf{Prompting}: \blue{ask} the model to behave according to human values
+            \textcolor<2->{fg!20}{
+        \item \textbf{Finetuning / Supervised learning}: \blue<1>{show} the model the right response in various context
+        \item \textbf{Reinforcement learning}: \blue<1>{reward / punish} the model when its behavior is aligned / unaligned with humans 
+        }
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Prompting the model to behave well}
+    Case study: truthfulness \href{https://arxiv.org/pdf/2109.07958.pdf}{[Lin et al., 2022]}
+
+        How do LLMs respond to misconceptions?
+        \begin{figure}
+        \includegraphics[height=0.4\textheight]{figures/truthfulqa}
+        \end{figure}
+\end{frame}
+
+\begin{frame}
+    {Prompting the model to behave well}
+    Case study: truthfulness \href{https://arxiv.org/pdf/2109.07958.pdf}{[Lin et al., 2022]}\\
+    \begin{figure}
+        \includegraphics[height=0.5\textheight]{figures/tqa}
+    \end{figure}
+        Larger models appear to be less truthful!
+\end{frame}
+
+\begin{frame}
+    {Prompting the model to answer questions truthfully}
+    \begin{figure}
+        \includegraphics[height=0.8\textheight]{figures/helpful-prompt}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    {Prompting the model to answer questions truthfully}
+    Model behavior varies according to the prompt:\\
+    \begin{figure}
+        \includegraphics[height=0.8\textheight,width=\textwidth,keepaspectratio]{figures/truthfulqa-prompt}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    {Prompting the model to answer questions truthfully}
+    Helpful prompt improves truthfulness of large models:\\[1ex]
+        \includegraphics[height=0.35\textheight,width=\textwidth,keepaspectratio]{figures/truthfulqa-prompt-result}
+
+        \pause
+    But requires engineering:\\[1ex]
+        \includegraphics[height=0.35\textheight,width=\textwidth,keepaspectratio]{figures/truthfulqa-prompt-eng}
+\end{frame}
+
+\begin{frame}
+    {Prompt engineering to attack the model}{}
+    How to ask the model to teach you how to spread misinformation? Role-playing.
+    \vspace{-1em}
+    \begin{figure}
+    \includegraphics[height=0.8\textheight]{figures/persona-attack}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    {Prompts can be overwritten}
+
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+    Ask it to ignore previous prompts:\\
+    \includegraphics[height=0.8\textheight]{figures/jailbreak-2}
+        \end{column}
+        \pause
+        \begin{column}{0.5\textwidth}
+    Create a fictional scenario where it needs to break rules:\\[1ex]
+        \includegraphics[height=0.8\textheight]{figures/jailbreak}
+        \end{column}
+        \end{columns}
+\end{frame}
+
+\begin{frame}
+    {Summary}
+    \textbf{Prompt engineering}: instruct the model to behave in a certain way
+
+    \green{Pros}:\\
+    \begin{itemize}
+        \item Easy to do---anyone can play around with it 
+        \item Efficient---no parameter updates
+        \item First thing to try
+    \end{itemize}
+
+    \pause
+    \red{Cons}:\\
+    \begin{itemize}
+        \item Unprincipled---no idea why it works or doesn't work
+        \item Unreliable---performance can have high variance 
+        \item Unsafe---easy to bypass 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Approaches to alignment}
+    \begin{itemize}
+        \itemsep1em
+            
+        \item \textcolor{fg!20}{
+                \textbf{Prompting}: {ask} the model to behave according to human values
+        }
+        \item \textbf{Finetuning / Supervised learning}: \blue{show} the model the right response in various context
+        \item \textcolor{fg!20}{
+                \textbf{Reinforcement learning}: {reward / punish} the model when its behavior is aligned / unaligned with humans 
+            }
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Supervised finetuning}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \begin{itemize}
+                \itemsep1em
+                \item How do we teach the model the right behavior?  
+                \item Going back to supervised learning: \blue{demonstrate} the right behavior
+                    \begin{itemize}
+                        \item Input: user prompt (task specification)
+                        \item Output: (aligned) response
+                    \end{itemize}
+                \item {\bf Key challenge}: {data collection} \\
+                    {\em How to get the prompts and responses?}
+
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+        \includegraphics[width=\textwidth]{figures/sft}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    {What kind of data do we need?}
+    Idea 1: use existing NLP benchmarks
+
+    \begin{itemize}
+        \item \textbf{Natural language inference}:\\
+            \textit{
+            Suppose "The banker contacted the professors and the athlete". Can we infer that "The banker contacted the professors"?
+        }
+    \item \textbf{Question answering}:\\
+            \textit{
+        Given the article "The Panthers finished the regular season [...]", what team did the Panthers defeat?
+    }
+\item \textbf{Sentiment analysis}:\\
+            \textit{
+    What's the rating of this review on a scale of 1 to 5:
+    We came here on a Saturday night and luckily it wasn't as packed as I thought it would be [...]
+}
+    \end{itemize}
+
+    \pause
+    But this is not what we ask ChatGPT to do! $\quad$ {\bf \red{distribution shift}}
+\end{frame}
+
+\begin{frame}
+    {What kind of data do we need?}
+   
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{itemize}[<+->]
+                \item {\bf Problem}: Gap between training and test data 
+                \item Straightforward {\bf solution}: collect training data that is similar to test data\\
+                    {\em How do we know what test data is like?}
+                \item Get some \blue{pilot data}\\
+                    {\em which requires a working-ish model first!}
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \onslide<4->{
+                    \begin{tikzpicture}
+                        \node (m) {model};
+                        \node (r) [below right=1.5cm and 0.5cm of m] {raw data};
+                        \node (t) [below left=1.5cm and 0.5cm of m] {training data};
+                        \draw[arrow] (m) -- node[above,sloped,anchor=south] {user} (r);
+                        \draw[arrow] (t) -- node[above,sloped,anchor=south] {finetuning} (m);
+                        \draw[arrow] (r) -- node[above] {annotation} (t);
+                    \end{tikzpicture}
+                }
+        \end{column}
+        \end{columns}
+\end{frame}
+
+\begin{frame}
+    {Data distribution from early OpenAI API}
+            \begin{figure}
+        \includegraphics[width=\textwidth]{figures/user-prompt}
+            \caption{From \href{https://arxiv.org/pdf/2203.02155.pdf}{[Ouyang et al., 2022]}}
+            \end{figure}
+\end{frame}
+
+\begin{frame}
+    {Tricky cases}
+
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \begin{itemize}
+                \item Recall that we want the model to \blue{infer user intention}
+                \item But also to make the right decisions that \blue{align with human values}
+                \item So it's important to include examples that invovle alignment decisions
+                    \pause
+                \item Open question: how to handle \blue{trade-off between helpfulness and harmfulness}?\\
+                    {\em e.g., user may request to generate toxic sentences for data augmentation}
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+            \begin{figure}
+        \includegraphics[width=\textwidth]{figures/prompt-diversity}
+            \caption{Data diversity}
+            \end{figure}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    {Summary}
+    \textbf{Supervised finetuning}: train the model to respond in an aligned way on human-annotated prompt-response data 
+
+    \green{Pros}:\\
+    \begin{itemize}
+        \item Relatively reliable---generalize to unseen data
+        \item User friendly---doesn't require extensive prompt engineering
+        \item Simple training pipeline---standard finetuning
+    \end{itemize}
+
+    \pause
+    \red{Cons}:\\
+    \begin{itemize}
+        \item Need a warm start---pilot data to decide what data to collect
+        \item Expensive---data needs to cover many uses cases 
+        \item Compute---need to update very large models 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Approaches to alignment}
+    \begin{itemize}
+        \itemsep1em
+            
+        \item \textcolor<1->{fg!20}{\textbf{Prompting}: {ask} the model to behave according to human values}
+        \item \textcolor<1->{fg!20}{\textbf{Finetuning / Supervised learning}: {show} the model the right response in various context
+        }
+        \item \textbf{Reinforcement learning}: \blue{reward / punish} the model when its behavior is aligned / unaligned with humans 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Learning from rewards}
+        \textbf{Motivation}:\\
+            \begin{itemize}
+                \item Demonstrations are expensive to obtain---can we learn from weaker signals?
+                \item For many tasks, humans (and animals) only get signal on whether they succeeded or not 
+            \end{itemize}
+
+        \textbf{Example}:\\
+            \begin{itemize}
+                \item Complex physical tasks: learning to shoot a basketball 
+                \item Reasoning: learning to play the game of Go 
+                \item Decision making: learning to optimize financial portfolios
+                \item Communication: learning to articulate your ideas to others
+            \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Reinforcement learning}
+
+            {\bf Goal}: learning from experience by maximizing the expected reward\pause
+            \begin{enumerate}[<+->]
+                \item Agent takes a sequence of \textbf{actions} in a world \hfill \onslide<6->{\blue{\em trial}}\\
+                    {\em Get a degree, update CV, apply for a job}
+                \item Agent gets \textbf{rewards} along the way indicating how well it did \hfill \onslide<6->{\blue{\em error}}\\
+                    {\em No reponse}
+                \item Agent updates its \textbf{policy} (on what actions to take) \hfill \onslide<6->{\blue{\em learn}}\\
+                    {\em Find a connection? Get an internship? Apply for a different position?}
+                \item Go back to 1 \hfill \onslide<6->{\blue{\em rinse and repeat}}
+            \end{enumerate}
+\end{frame}
+
+\begin{frame}
+    {Reinforcement learning: formalization}
+    \begin{columns}
+        \begin{column}{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figures/grid}
+        \end{column}
+        \begin{column}{0.7\textwidth}
+            At each time step $t$, an agent
+            \begin{itemize}[<+->]
+                \item is in a \textbf{state} $s_t\in\sS$ \hfill($\sS$ is the {\bf state space})\\ \texttt{cell[i][j]} in the grid world
+                \item takes an \textbf{action} $a_t\in\sA$ \hfill($\sA$ is the {\bf action space})\\
+                    \{\texttt{up, down, left, right}\}
+                \item transitions to the next state $s_{t+1}$ according to a {\bf transition function} $p(\cdot\mid s_t, a_t)$\\
+                    moves to the corresponding cell if there's no blocker
+                \item obtains a {\bf reward} $r(s_t, a_t)$ according to
+                    the {\bf reward function} $r\colon \sS \times \sA \rightarrow \BR$\\
+                    1 if $s_{t+1}$ is star and 0 otherwise
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    {Reinforcement learning: objective}{}
+    The agent uses a {\bf policy} $\pi$ to decide which actions to take in a state:\\
+    \begin{itemize}
+        \item Deterministic: $\pi(s) = a$
+        \item Stochastic: $\pi(a\mid s) = \BP(A=a\mid S=s)$ $\quad$ (our focus)
+    \end{itemize}
+    \pause
+
+    A policy $\pi_\theta$ defines a distribution $p_\theta(\tau)$ over \textbf{trajectories} $\tau=(a_1,s_1,\ldots,a_T,s_T$).
+    \vspace{-1em}
+    \begin{figure}
+        \includegraphics[width=0.5\textwidth]{figures/traj}
+    \end{figure}
+
+    \pause\vspace{-1ex}
+    The agent's {\bf objective} is to learn a policy $\pi_\theta$ (parametrized by $\theta$) that maximizes the \blue{expected} \green{return}:
+    \vspace{-1ex}
+    $$
+    \mathrm{maximize}\; \blue{\BE_{{\tau\sim p_\theta(\tau)}}} \pb{\green{\sum_{t=1}^T r(s_t, a_t)}}
+    $$
+\end{frame}
+
+\begin{frame}
+    {Sketch of RL algorithms}
+    \begin{columns}
+        \begin{column}{0.4\textwidth}
+            \begin{figure}
+        \includegraphics[width=\textwidth]{figures/rl-basics}
+                \caption{From Sergey Levine's slides}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.6\textwidth}
+            Key steps:\\
+            \begin{itemize}
+                \item \textcolor{orange}{\bf Trial}: run policy to generate trajectories
+                \item \green{\bf Error}: estimate expected return
+                \item \blue{\bf Learn}: improve the policy  
+            \end{itemize}
+
+            \pause
+            Challenges:\\
+            \begin{itemize}
+                \item Trials could be expensive (e.g., healthcare, education) 
+                \item Reward signal could be expensive and sparse (e.g., expert feedback) 
+                \item May need many samples to learn a good policy
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    {Policy gradient algorithms}
+            \begin{figure}
+        \includegraphics[width=0.8\textwidth]{figures/pg}
+            \end{figure}
+
+            \vspace{-2em}
+            While not converged\\
+            \begin{enumerate}
+                \item Sample trajectories from the current policy 
+                \item Estimate return for each trajectories based on observed rewards
+                \item Take a gradient step on the expected return (w.r.t. the policy)
+            \end{enumerate}
+\end{frame}
+
+\begin{frame}
+    {How to compute the gradient?}
+
+    Notation: let $r(\tau)=\sum_{t=1}^T r(a_t, s_t)$ be the return.
+    \pause
+
+    $$
+    \text{Our objective:} \quad
+    J(\theta)=\blue{\BE_{\tau\sim p_\theta(\tau)}}\pb{r(\tau)}
+    =\blue{\sum_\tau p_\theta(\tau)} r(\tau)
+    $$
+    \pause
+
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+    \begin{align*}
+    \nabla_\theta J(\theta) &= \nabla_\theta \sum_\tau p_\theta(\tau) r(\tau)\\
+        &= \sum_\tau \green{\nabla_\theta p_\theta(\tau)} r(\tau)\\
+        &= \sum_\tau \green{p_\theta(\tau) \nabla_\theta \log p_\theta(\tau)} r(\tau)\\
+        &= \BE_{\tau\sim p_\theta(\tau)}\pb{\nabla_\theta \log p_\theta(\tau) r(\tau)}
+    \end{align*}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{mdframed}[backgroundcolor=gray!20, linewidth=0pt, frametitle={log derivative trick}]
+    \begin{align*}
+        &p_\theta(\tau) \nabla_\theta \log p_\theta(\tau)\\
+        =&   p_\theta(\tau) \frac{\nabla_\theta p_\theta(\tau)}{p_\theta(\tau)}\\
+        =& \nabla_\theta p_\theta(\tau)
+    \end{align*}
+            \end{mdframed}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    {How to compute the gradient?}
+    Good news: the gradient is now inside the expectation 
+    $$
+    \nabla_\theta J(\theta) = \BE_{\tau\sim p_\theta(\tau)}\pb{\nabla_\theta \log p_\theta(\tau) r(\tau)}
+    \quad \text{average gradient of sampled trajectory}
+    $$
+
+    \onslide<2->{
+    But what is $p_\theta(\tau)$?
+    \begin{align*}
+        p_\theta(\tau) &= p_\theta(a_1,s_1,\ldots,a_T,s_T) = 
+        p(s_1)\prod_{t=1}^T \pi_\theta(a_t\mid s_t) \prod_{t=1}^{T-1}p(s_{t+1}\mid s_t,a_t)\\
+        \onslide<3->{
+            \log p_\theta(\tau) &= \log p(s_1) + \sum_{t=1}^T \log\pi_\theta(a_t\mid s_t) + \sum_{t=1}^{T-1}\log p(s_{t+1}\mid s_t,a_t)\\
+        }
+        \onslide<4->{
+        \nabla_\theta J(\theta) &= \BE_{\tau\sim p_\theta(\tau)}\pb{
+            \p{\sum_{t=1}^T \nabla_\theta\log\pi_\theta(a_t\mid s_t)}
+        \p{\sum_{t=1}^T r(s_t,a_t)}
+    }}
+    \end{align*}
+    }
+\end{frame}
+
+\begin{frame}
+    {Putting everything together}
+    REINFORCE algorithm:\\
+    \begin{enumerate}
+        \item Sample $N$ trajectories $\tau^1,\ldots,\tau^N$ from $\pi_\theta$
+        \item Estimate the gradient: 
+            $$
+            \nabla_\theta J(\theta) \approx \sum_{i=1}^N
+            \p{\sum_{t=1}^T \nabla_\theta\log\pi_\theta(a_t^i\mid s_t^i)}
+            \p{\sum_{t=1}^T r(s_t^i,a_t^i) }
+            $$
+        \item Update the policy with gradient ascent: $\theta \leftarrow \theta + \alpha \nabla_\theta J(\theta)$
+        \item Go back to 1
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}
+    {How is all this related to LLMs?}{}
+    Think of tokens as actions:\\
+    \begin{itemize}
+        \item Action space: vocabulary $\quad$ $a_t = x_t\in\sV$
+        \item State space: history / prefix $\quad$ $s_t = (x_1,\ldots,x_{t-1})$
+        \item Policy: a language model $\quad$ $p_\theta(x_t\mid x_{<t})$
+        \item Trajectory: a sentence / generation $\quad$ $x_1,\ldots,x_T$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {How is all this related to LLMs?}{}
+    REINFORCE algorithm on text:\\
+    \begin{enumerate}
+        \item Sample $N$ generations from the language model $p_\theta$
+        \item Estimate the gradient: 
+            $
+            \nabla_\theta J(\theta) \approx \sum_{i=1}^N
+            \p{\sum_{t=1}^T \nabla_\theta\log p_\theta(x_t^i\mid x_{<t}^i)}
+            r(x_{1:T}) 
+            $
+        \item Update the policy with gradient ascent: $\theta \leftarrow \theta + \alpha \nabla_\theta J(\theta)$
+        \item Go back to 1
+    \end{enumerate}
+    \pause
+
+    \begin{mdframed}[backgroundcolor=gray!20, linewidth=0pt, frametitle={What is the algorithm doing?}]
+        If $r(x_{1:T})$ is \green{positive}, take a gradient step to \green{increase $p_\theta(x_{1:T})$}.\\ %proportional to the reward.
+        If $r(x_{1:T})$ is \red{negative}, take a gradient step to \red{decrease $p_\theta(x_{1:T})$}. %proportional to the reward.
+
+        {\em Supervised learning on model generations weighted by rewards}
+    \end{mdframed}
+
+    \pause
+    \think{How to get $r(x_{1:T})$ (i.e. reward of a generation)?} (next time!)
+\end{frame}
+
+\begin{frame}
+    {Summary}{}
+    \textbf{Reinforcement learning}: align the model by giving it feedback on whether an output is good or bad
+
+    \green{Pros}:\\
+    \begin{itemize}
+        \item Cost-efficient---humans only need to provide judgments/rewards
+        \item General---can be used to model all kinds of human preferences
+    \end{itemize}
+
+    \pause
+    \red{Cons}:\\
+    \begin{itemize}
+        \item Complex pipeline---RL algorithms need more engineering
+        \item Reward hacking---models are good at finding ways to "cheat"\\
+            {\em Generating polite and authorative nonsense}
+        \item Human judgments on some subjects are inherently diverse 
+    \end{itemize}
+\end{frame}
+
+\end{document}
