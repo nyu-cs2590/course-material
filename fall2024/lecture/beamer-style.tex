@@ -1,0 +1,201 @@
+%  beamer style
+%\usetheme{Boadilla}
+%\useoutertheme{infolines}
+%\usefonttheme{structurebold}
+%\setbeamercolor{frametitle}{fg=black,bg=white}
+\colorlet{theme}{black!70}
+\usepackage[default, scale=0.92]{opensans}
+\setbeamerfont{frametitle}{series={\fontseries{bc}}}
+\setbeamercolor{frametitle}{fg=theme}
+
+% color
+\newif\ifstartedinmathmode
+\definecolor{beamerblue}{rgb}{0.2,0.2,0.7}
+\definecolor{green}{HTML}{8DC73E}
+\definecolor{red}{RGB}{220,20,60}
+\definecolor{blue}{RGB}{30,144,255}
+\newcommand<>{\red}[1]{\textcolor#2{red}{#1}}
+\newcommand<>{\mred}[1]{{\color#2{red}#1}}
+\newcommand<>{\blue}[1]{\textcolor#2{blue}{#1}}
+\newcommand<>{\mblue}[1]{{\color#2{blue}#1}}
+\newcommand<>{\green}[1]{\textcolor#2{green}{#1}}
+\newcommand<>{\mgreen}[1]{{\color#2{green}#1}}
+\newcommand<>{\beamerblue}[1]{\textcolor#2{beamerblue}{#1}}
+\newcommand<>{\mbeamerblue}[1]{{\color#2{beamerblue}#1}}
+\newcommand{\mycite}[2][]{\href{#1}{\color{brown} #2}}
+%\newcommand{\green}[1]{\textcolor{ForestGreen}{#1}}
+%\newcommand{\red}[1]{\textcolor{red}{#1}}
+%\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+
+\hypersetup{
+    colorlinks=true,      % Enables link colors
+    linkcolor=blue,        % Color for internal links (like sections)
+    filecolor=blue,    % Color for linked files
+    urlcolor=blue,        % Color for URLs
+    citecolor=green       % Color for citations
+}
+
+
+%\setbeamercolor{frametitle}{fg=blue}
+%\setbeamercolor{title}{fg=black}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\addtobeamertemplate{block begin}{}{}
+\addtobeamertemplate{block end}{}{\medskip}
+
+% itemize
+\newenvironment{wideitemize}{\itemize\addtolength{\itemsep}{5pt}}{\enditemize}
+\setbeamertemplate{itemize items}[circle]
+\setbeamertemplate{enumerate items}[default]
+%\setbeamerfont*{itemize/enumerate body}{size=\large}
+\setbeamerfont*{itemize/enumerate subbody}{parent=itemize/enumerate body}
+\setbeamerfont*{itemize/enumerate subsubbody}{parent=itemize/enumerate body}
+% Set global item separation
+\setlength{\itemsep}{1em} % or any value you prefer
+%\setlength{\enumerateitemsep}{5pt}
+%\setlength{\descriptionitemsep}{5pt}
+
+
+% Background
+\definecolor{MyBackground}{RGB}{255,253,218}
+%% Uncomment this if you want to change the background color to something else
+%\setbeamercolor{background canvas}{bg=MyBackground}
+
+%% Change the bg color to adjust your transition slide background color!
+\newenvironment{transitionframe}{
+  \setbeamercolor{background canvas}{bg=yellow}
+  \begin{frame}}{
+    \end{frame}
+}
+
+\newenvironment<>{simpleblock}[1]{%
+  \begin{actionenv}#2%
+      \def\insertblocktitle{#1}%
+      \par%
+      \mode<presentation>{%
+        \setbeamercolor{block title}{fg=normal text.fg, bg=normal text.bg}
+       \setbeamercolor{block body}{bg=normal text.bg}
+     }%
+      \usebeamertemplate{block begin}}
+    {\par\usebeamertemplate{block end}\end{actionenv}}
+    
+
+% tikz styles
+\usepackage{tikz}
+\usepackage{xparse}%  For \NewDocumentCommand
+\usepackage{calc}%    For the \widthof macro
+\usetikzlibrary{shapes.geometric, arrows}
+\usetikzlibrary{calc}
+\usetikzlibrary{tikzmark}
+ \usetikzlibrary{overlay-beamer-styles}
+\usetikzlibrary{positioning}
+%\usetikzlibrary{shapes.multipart}
+
+
+
+%\tikzstyle{textbox}=[rectangle, rounded corners, text centered, draw=#1, thick, fill=#1!15]
+\tikzstyle{textboxMinimal}=[rectangle, text centered, draw=#1, thick]
+\tikzstyle{textcircle}=[circle, text centered, draw=#1, thick, fill=#1!15, minimum width=0.8cm, inner sep=0pt]
+\tikzstyle{arrow}=[thick, ->, >=stealth, black]
+
+\tikzset{
+	textbox/.style 2 args={rectangle, rounded corners, text centered, draw={#1}, thick, fill={#1!15}, minimum height={#2}},
+	textbox/.default={blue}{1cm},
+}
+
+\tikzset{
+    invisible/.style={opacity=0},
+    visible on/.style={alt={#1{}{invisible}}},
+    alt/.code args={<#1>#2#3}{%
+      \alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}} % \pgfkeysalso doesn't change the path
+    },
+  }
+
+%% draw box
+%\newcommand{\tikzmark}[1]{\tikz[overlay,remember picture] \node (#1) {};}
+
+\makeatletter
+\NewDocumentCommand{\DrawBox}{s O{}}{%
+    \tikz[overlay,remember picture]{
+    \IfBooleanTF{#1}{%
+        \coordinate (RightPoint) at ($(pic cs:left |- pic cs:right)+(\linewidth-\labelsep-\labelwidth,0.0)$);
+    }{%
+        \coordinate (RightPoint) at (pic cs:right.east);
+    }%
+    \draw[red,#2]
+      ($(pic cs:left)+(-0.2em,0.9em)$) rectangle
+      ($(RightPoint)+(0.2em,-0.3em)$);}
+}
+
+\NewDocumentCommand{\DrawBoxWide}{s O{}}{%
+    \tikz[overlay,remember picture]{
+    \IfBooleanTF{#1}{%
+        \coordinate (RightPoint) at ($(pic cs:left |- pic cs:right)+(\linewidth-\labelsep-\labelwidth,0.0)$);
+    }{%
+        \coordinate (RightPoint) at (pic cs:right.east);
+    }%
+    \draw[red,#2]
+      ($(pic cs:left)+(-\labelwidth,0.9em)$) rectangle
+      ($(RightPoint)+(0.2em,-2em)$);}
+}
+\makeatother
+
+%% comment box
+% tikz
+\newenvironment{commentbox}[1][blue]
+  {\begin{tikzpicture}[remember picture,overlay,
+  	expl/.style={draw=#1,fill=#1!20,rounded corners,text width=4cm},
+  	arrow/.style={#1,thick,->,>=latex}]
+  }
+  {\end{tikzpicture}
+  }
+  
+% tikz overlay
+\tikzset{
+fade/.style={opacity=#1},
+fade/.default={1},
+fade on/.style={alt=#1{}{fade}},
+}
+
+% other styles
+
+% textbox
+\newenvironment{filledbox}[2][beamerblue]
+  {\begin{tikzpicture}
+    \def\boxcolor{#1}
+      \node [draw=#1, fill=#1!10, thick, rectangle, rounded corners, inner sep=10pt, inner ysep=10pt, text width=#2] (box)
+      \bgroup
+  }
+  {
+      \egroup;
+    \end{tikzpicture}
+  }
+
+\newenvironment{titledbox}[3][theme]
+  {\begin{tikzpicture}
+    \def\boxcolor{#1}
+    \def\boxname{#3}
+    \node [draw=#1, thick, rectangle, rounded corners, inner sep=10pt, inner ysep=10pt, text width=#2] (box)
+      \bgroup
+  }
+  {
+      \egroup;
+      \node[fill=white,right=10pt] at (box.north west) {\textcolor{\boxcolor}{\boxname}};
+    \end{tikzpicture}
+  }
+
+% icon
+\newcommand{\idea}[1]{
+    \begin{tikzpicture}
+        \node[anchor=south](bulb){\includegraphics[height=1cm]{../figures/lightbulb}};
+        \node[right=0cm of bulb, anchor=west, text width=0.9\linewidth]{#1};
+    \end{tikzpicture}
+}
+
+\newcommand{\think}[1]{
+    \begin{tikzpicture}
+        \node[anchor=south](bulb){\includegraphics[height=0.7cm]{../figures/thinking-face}};
+        \node[right=0cm of bulb, anchor=west, text width=0.9\linewidth]{#1};
+    \end{tikzpicture}
+}
