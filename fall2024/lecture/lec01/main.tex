@@ -64,6 +64,7 @@
         \item Best way to communicate with us: \textbf{Campuswire} (registration link and code on Brightspace).
         \item Office hours will be in-person or on Zoom if no in-person bookings.
         \item Let us know if you have accessibility needs.
+        \item Pdf slides will be uploaded before the lecture.
     \end{wideitemize}
 \end{frame}
 
@@ -113,21 +114,22 @@
 \begin{frame}
     {Products powered by NLP technologies}
     \begin{tikzpicture}
-        \node (translation) {\includegraphics[width=10cm]{figures/google-translate}};
-        \node (qa) [below= of translation, anchor=north east, yshift=3em]{\includegraphics[width=5cm]{figures/search-qa}};
-        \node [right= of qa]{\includegraphics[width=5cm]{figures/alexa}};
+        \node (review) {\includegraphics[width=10cm]{figures/review}};
+        \node [right= of review] {Summarization};
+        \node (qa) [below= of review, anchor=north east, yshift=3em]{\includegraphics[width=5cm]{figures/macbook}};
+        \node [right= of qa] {Question answering};
     \end{tikzpicture}
 \end{frame}
 
 \begin{frame}
-    {A single natural language interface for everything}
+    {Natural language can be an interface for almost all tasks}
     \begin{figure}
         \includegraphics[width=10cm]{figures/chatgpt-1}
     \end{figure}
 \end{frame}
 
 \begin{frame}
-    {A single natural language interface for everything}
+    {Natural language can be an interface for almost all tasks}
     \begin{figure}
         \includegraphics[width=10cm]{figures/chatgpt-2}
     \end{figure}
@@ -225,13 +227,13 @@
     {Limitations of early systems}
     \begin{itemize}
         \itemsep1em
-        \item Optimism in the 50's and 60's: working on tasks that are too complex at that time\\[1ex]
+        \item Optimism in the 50's and 60's: working on tasks that were too complex at that time\\[1ex]
             \nl{Within the very near future---much less than twenty-five years---we shall have the technical capability of substituting machines for any and all human functions in organizations.}
         \item Disappointing results due to
             \begin{itemize}
                 \item \textbf{Limited computation}: hardware has limited speed and memory 
                 \item \textbf{Combinatorial explosion}: algorithms are intractable in realistic settings
-                \item \textbf{Underestimated complexity}: ambiguity, commonsense knowledge etc.
+                \item \textbf{Underestimated complexity}: ambiguity, commonsense knowledge, multimodality, etc.
             \end{itemize}
     \end{itemize}
 \end{frame}
@@ -241,7 +243,7 @@
     \begin{itemize}
         \itemsep1em
         \item Notable progress in MT from IBM (neglected knowlege of linguistics).
-        \item HMMs widely used for speech recognition.\\
+        \item HMMs widely used for speech recognition.\\[1ex]
             \nl{Every time I fire a linguist, the performance of the speech recognizer goes up.}---Frederick Jelinek.
         \item The paradigm shift: \blue{expert knowledge + rules $\rightarrow$ data + features}
         \item Statistical learning is the main driving force of NLP today.
@@ -252,7 +254,7 @@
     {The deep learning tsunami}
     \begin{itemize}
         \itemsep1em
-        \item Before deep learning (around 2015), NLP is mostly about structured prediction and feature engineering.
+        \item Before deep learning (circa 2015), NLP is mostly about structured prediction and feature engineering.
         \item Neural networks can automatically learn good features/representations for a task 
         \item The paradigm shift: \blue{features $\rightarrow$ network architectures + embeddings}
         \item Almost all NLP models are neural networks nowadays.
@@ -263,18 +265,41 @@
     {Models and data keep getting larger}
     \begin{itemize}
         \itemsep1em
-        \item Since around 2018, Transformer-based pretrained models have become the standard. 
-        \item Pre-training on large data provides useful representations for many downstream tasks.
+        \item Since around 2018, Transformer-based pretrained models have become the foundation models. 
+        \item Pretraining on large data provides useful representations for many downstream tasks.
         \item The paradigm shift: \blue{architecture design $\rightarrow$ transfer learning (fine-tuning)}
         \item More recently, a single natural language interface for all tasks (\eg ChatGPT by OpenAI).
         \item The paradigm shift: \blue{transfer learning $\rightarrow$ instructing / prompting}
     \end{itemize}
 \end{frame}
 
+\begin{frame}
+    {Structure of the course}
+    \begin{wideitemize}
+        \item {\bf Module 1: supervised learning}\\
+            \gray{\it How to formalize NLP tasks?}
+            \begin{itemize}
+                \item Word vectors, RNNs, Transformers, encoders and decoders
+            \end{itemize}
+
+        \item {\bf Module 2: representation learning}\\
+            \gray{\it How to learn general representations of text without annotation?}
+            \begin{itemize}
+                \item Pretraining and finetuning (BERT, GPT, T5)
+            \end{itemize}
+
+        \item {\bf Module 3: large language models} \\
+            \gray{\it Can a single model solve all tasks?}
+            \begin{itemize}
+                \item Scaling, alignment (SFT, RLHF, DPO), evaluation  
+            \end{itemize}
+    \end{wideitemize}
+\end{frame}
+
 \subsection{Challenges in NLP}
 
 \begin{frame}
-    {Why is language hard?}
+    {Why is natural language hard?}
     \pause
     \begin{itemize}
         \item \textbf{Discrete}
@@ -290,9 +315,9 @@
                     \medskip
                     \begin{tabular}{p{7cm}cp{5cm}}
                     The food is okay. & $\rightarrow$ & The food is awesome! \\
-                    They made a brief return to Cambridge to drop the book. & $\rightarrow$& They returned.
+                    They made a brief return to Cambridge. & $\rightarrow$& They returned.
                     \end{tabular}
-                \item In general, hard to represent text as mathematical objects.
+                \item In general, it's hard to represent text as mathematical objects.
             \end{itemize}
     \end{itemize}
     \begin{table}
@@ -300,13 +325,13 @@
 \end{frame}
 
 \begin{frame}
-    {Why is language hard?}
+    {Why is natural language hard?}
     \begin{itemize}
         \item \textbf{Compositional}
             \begin{itemize}
                 \item The whole is built from parts (chars, words, sentences, paragraphs, documents...)
                 \item How to generalize when we don't see all possible combinations?\\
-                \item An example from \mycite{Lake et al., 2018}\\
+                \item Can't brute force! E.g., \mycite[http://proceedings.mlr.press/v80/lake18a/lake18a.pdf]{Lake et al., 2018}\\
                 Vocabulary:\\
                     \begin{itemize}
                     \item[]\{jump, walk, turn, once, twice, left, right, before, after, and\}
@@ -324,7 +349,7 @@
 \end{frame}
 
 \begin{frame}
-    {Why is language hard?}
+    {Why is natural language hard?}
     \begin{itemize}
         \item \textbf{Sparse} 
             \begin{itemize}
@@ -333,8 +358,8 @@
                     \begin{figure}
                         \includegraphics[height=3cm]{figures/zipf}
                     \end{figure}
-                \item Many linguistic phenomena follow Zipf's law\\
-                    BoA's financial assistant Erica:\\
+                \item Many linguistic phenomena follow Zipf's law, e.g.,\\
+                    BoA's financial assistant Erica:
                     \textit{The bank ``learned [that] there are over 2,000 different ways to ask us to move money.''}\footnote[frame]{
                         \url{https://www.aiqudo.com/2019/06/28/voice-success-story-erica-bank-america/}
                     }
@@ -343,7 +368,7 @@
 \end{frame}
 
 \begin{frame}
-    {Why is language hard?}
+    {Why is natural language hard?}
     \begin{itemize}
         \item \textbf{Ambiguous} 
             \begin{itemize}
@@ -351,11 +376,11 @@
                 \medskip
                 \begin{itemize}
                     \itemsep2em
-                    \item[] Bass: fish? guitar? frequency? (word sense disambiguiation)
-                    \item[] I shot an elephant in my pajamas: who is in the pajamas? (PP attachment)
-                    \item[] The spirit is willing but the flesh is weak.\\
+                    \item[] {\it Bass}: fish? guitar? frequency? (word sense disambiguiation)
+                    \item[] {\it I shot an elephant in my pajamas}: who is in the pajamas? (PP attachment)
+                    \item[] {\it The spirit is willing, but the flesh is weak.}\\
                         $\rightarrow$ 
-                        The vodka is strong but the meat is rotten.
+                        The vodka is strong but the meat is rotten. (machine translation)
                 \end{itemize}
             \end{itemize}
     \end{itemize}
@@ -364,35 +389,35 @@
 \section{Supervised learning basics}
 
 \subsection{Generalization}
-\begin{frame}
-    {Rule-based approach}
-\begin{figure}
-\includegraphics[height=0.7\textheight]{figures/geron-fig1-1}
-    \caption{{Fig 1-1 from \emph{Hands-On Machine Learning with Scikit-Learn and TensorFlow} by Aurelien Geron (2017).}}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-    {Machine learning approach}
-\begin{figure}
-\includegraphics[height=0.7\textheight]{figures/geron-fig1-2}
-    \caption{{Fig 1-2 from \emph{Hands-On Machine Learning with Scikit-Learn and TensorFlow} by Aurelien Geron (2017).}}
-\end{figure}
-\end{frame}
+%\begin{frame}
+%    {Rule-based approach}
+%\begin{figure}
+%\includegraphics[height=0.7\textheight]{figures/geron-fig1-1}
+%    \caption{{Fig 1-1 from \emph{Hands-On Machine Learning with Scikit-Learn and TensorFlow} by Aurelien Geron (2017).}}
+%\end{figure}
+%\end{frame}
+%
+%\begin{frame}
+%    {Machine learning approach}
+%\begin{figure}
+%\includegraphics[height=0.7\textheight]{figures/geron-fig1-2}
+%    \caption{{Fig 1-2 from \emph{Hands-On Machine Learning with Scikit-Learn and TensorFlow} by Aurelien Geron (2017).}}
+%\end{figure}
+%\end{frame}
 
 \begin{frame}
     {Example: spam filter}
     
     \begin{itemize}
         \itemsep1em
-        \item Rules
+        \item Writing {\bf rules}
             \begin{itemize}
                 \item[] Contains ``Viagra''
                 \item[] Contains ``Rolex''
                 \item[] Subject line is all caps
                 \item[] ... 
             \end{itemize}
-        \item Learning from data
+        \item Learning from {\bf data}
             \begin{enumerate}
                 \item Collect emails labeled as spam or non-spam 
                 \item Design features, e.g., first word of the subject, nouns in the main text
@@ -405,24 +430,23 @@
 
 \begin{frame}
     {Key challenges in machine learning}
-    \begin{itemize}
-        \itemsep1em
-        \item Availability of large amounts of (annotated) data
-            \begin{itemize}
+    \begin{wideitemize}
+        \item Availability of large amounts of (annotated) {\bf data}
+            \begin{wideitemize}
                 \item Data collection: scraping, crowdsourcing, expert annotation
                 \item Quality control: data quality can have large impact on the final model (garbage in garbage out)
                 \item Don't take it for granted: always check the data source!
-            \end{itemize}
-    \end{itemize}
+            \end{wideitemize}
+    \end{wideitemize}
     \medskip\pause
     \think{How would you collect a dataset for the spam filtering task?}
 \end{frame}
 
 \begin{frame}
     {Key challenges in machine learning}
-    \begin{itemize}
+    \begin{wideitemize}
         \item \textbf{Generalize} to unseen samples
-            \begin{itemize}
+            \begin{wideitemize}
                 \item We want to build a model: $h\colon \sX \text{ (input space)} \rightarrow \sY \text{ (output space)}$
                 \item It is easy to achieve high accuracy on the training set.
                 \item But we want the model to perform well on unseen data, too.
@@ -431,46 +455,53 @@
                % \item Assume that there is a (unknown) data generating distribution: $\sD$ over $\sX\times\sY$
                %\item Goal: \blue{minimize }:$\text{minimize}\quad 
                %    \mathbb{E}_{(x,y)\sim\sD}\pb{\text{error}(h,x,y)}$ (estimated on the test set)
-            \end{itemize}
-    \end{itemize}
+            \end{wideitemize}
+    \end{wideitemize}
+\end{frame}
+
+\begin{frame}
+    {Risk minimization}
+
+    \begin{wideitemize}[<+->]
+        \item Assume a data generating distribution $\sD$ over $\sX\times\sY$ (e.g., spam writers and non-spam writers)
+        \item We have access to a training set: $m$ samples from $\sD$, $\pc{(x^{(i)}, y^{(i)})}_{i=1}^m$
+        \item We can measure the goodness of a prediction $h(x)$ by comparing it against the groundtruth $y$ using some \textbf{loss function} $L$
+        \item Our goal is to minimize the \blue{expected loss} over $\sD$ (\textbf{risk}):
+            $$
+\text{minimize}\quad \mathbb{E}_{(x,y)\sim\sD}\pb{L(h,x,y)} \;,
+            $$
+            but it \red{cannot be computed} (why?).
+    \end{wideitemize}
 \end{frame}
 
 \begin{frame}
     {Empirical risk minimization (ERM)}
 
-    \begin{itemize}[<+->]
-        \item Assume a data generating distribution $\sD$ over $\sX\times\sY$ (e.g., spam writers and non-spam writers)
-        \item We have access to a training set: $m$ samples from $\sD$ $\pc{(x^{(i)}, y^{(i)})}_{i=1}^m$
-        \item We can measure the goodness of a prediction $h(x)$ by comparing it against the groundtruth $y$ using some \textbf{loss function}
-        \item Our goal is to minimize the \blue{expected loss} over $\sD$ (\textbf{risk}):
-            $$
-\text{minimize}\quad \mathbb{E}_{(x,y)\sim\sD}\pb{\mathrm{error}(h,x,y)} \;,
-            $$
-            but it \red{cannot be computed} (why?).
-\item Instead, we minimize the \blue{average loss on the training set} (\textbf{empirical risk})  %over $\sH$
+    \begin{wideitemize}[<+->]
+        \item Instead, we minimize the \blue{average loss on the training set} (\textbf{empirical risk})  %over $\sH$
     $$
-    \text{minimize}\quad \frac{1}{m}\sum_{i=1}^m \mathrm{error}(h, x^{(i)}, y^{(i)})
+    \text{minimize}\quad \frac{1}{m}\sum_{i=1}^m L(h, x^{(i)}, y^{(i)})
     $$
-
-%\item In the limit of infinite samples, empirical risk converges to risk (LLN).
-\item {\bf Key question}: does small empirical risk imply small risk? 
-    \end{itemize}
+            \begin{itemize}
+                \item {In the limit of infinite samples, empirical risk converges to risk (LLN).}
+            \end{itemize}
+        \item {\bf Key question}: does small empirical risk imply small risk? 
+        \item Trivial solution to (unconstrained) ERM: \red{memorize} the data points
+    \end{wideitemize}
 \end{frame}
-
-%\begin{frame}
-%    {Error decomposition}
-%\end{frame}
 
 \begin{frame}
     {Overfitting vs underfitting}
-    \begin{itemize}
-        \item Trivial solution to (unconstrained) ERM: \red{memorize} the data points
-        \item Need to extrapolate information from one part of the input space to unobserved parts!
+    \begin{wideitemize}
+        \item Problem: extrapolate information from one part of the input space to unobserved parts!
+            \begin{itemize}
+                \item training set $\to$ test set
+            \end{itemize}
         \item Solution: constrain the prediction function to a subset, i.e.\ a \textbf{hypothesis space} $h\in \sH$.
             \pause
         \item Trade-off between complexity of $\sH$ and generalization 
-        \item Question for us: \blue{how to choose a good $\sH$ for certain domains}
-    \end{itemize}
+        \item Question for us: \blue{how to choose a good $\sH$ for certain domains/tasks}
+    \end{wideitemize}
 \end{frame}
 
 \begin{frame}
@@ -486,10 +517,10 @@
 \subsection{Loss functions}
 
 \begin{frame}
-    {Setup}
+    {Formalization}
     \begin{itemize}
         \itemsep1em
-        \item Task: binary classification $y\in\pc{+1, -1}$
+        \item Task: binary classification $x\in\sX, y\in\pc{+1, -1}$
         \item Model: $f_w\colon \sX \rightarrow \bR$ parametrized by $w \in \bR^d$
             \begin{itemize}
                 \item Output a score for each example
@@ -561,15 +592,15 @@
 
 \subsection{Optimization}
 
-\begin{frame}
-    {Gradient descent}
-    \begin{itemize}
-        \item The gradient of a function $F$ at a point $w \in \BR^d$ is the direction of fastest increase in the function value
-        \item To minimze $F(w)$, move in the opposite direction
-        $$w \leftarrow w - \eta\nabla_w F(w)$$
-        \item Converge to a local minimum (also global minimum if $F(w)$ is \textbf{convex}) with carefully chosen step sizes $\eta$
-    \end{itemize}
-\end{frame}
+%\begin{frame}
+%    {Gradient descent}
+%    \begin{itemize}
+%        \item The gradient of a function $F$ at a point $w \in \BR^d$ is the direction of fastest increase in the function value
+%        \item To minimze $F(w)$, move in the opposite direction
+%        $$w \leftarrow w - \eta\nabla_w F(w)$$
+%        \item Converge to a local minimum (also global minimum if $F(w)$ is \textbf{convex}) with carefully chosen step sizes $\eta$
+%    \end{itemize}
+%\end{frame}
 
 \begin{frame}
     {Stochastic gradient descent}
@@ -593,7 +624,7 @@
         \caption{Minimize $1.25(x + 6)^2 + (y - 8)^2$. Example from ``Understanding Machine Learning: From Theory to Algorithms''}
         \includegraphics[height=5cm]{figures/gd-vs-sgd}
     \end{figure}
-    SGD step is noisier as it gets closer to the optimum; need to reduce step size gradually.
+    SGD step is noisier closer to the optimum---need to reduce step size gradually.
 \end{frame}
 
 \begin{frame}
@@ -845,7 +876,7 @@ overall good movie for anyone looking for a laugh
 \end{frame}
 
 \begin{frame}
-    {MLE and ERM}
+    {Quick remark: MLE and ERM}
     ERM:
     $$
     \min \sum_{i=1}^N \ell(x^{(i)}, y^{(i)}, \theta)
@@ -912,7 +943,7 @@ overall good movie for anyone looking for a laugh
     \begin{align*}
         \text{score of class $k$} = \log p_\theta(x \mid y=k) = \sum_{i=1}^n \log p_\theta(x_i \mid y=k) 
     \end{align*}
-    (Adding up positive/negative scores of each word)
+    {\bf In practice}, adding up positive/negative scores of each word.
 \end{frame}
 
 \begin{frame}
@@ -932,64 +963,38 @@ overall good movie for anyone looking for a laugh
 
 \begin{frame}
     {Summary of Naive Bayes models}
-    \begin{itemize}
+    \begin{wideitemize}
         \item Modeling: the conditional indepedence assumption simplifies the problem
         \item Learning: MLE (or ERM with negative log-likelihood loss)
         \item Inference: very fast (adding up scores of each word)
-    \end{itemize}
+    \end{wideitemize}
 \end{frame}
 
 \subsection{Discriminative models: logistic regression}
 
 \begin{frame}
-    {Discriminative models}
-    % TODO: move this slides to later
-    \textbf{Idea}: directly model the conditional distribution $p(y\mid x)$
-    \pause
-    \begin{table}
-        \renewcommand{\arraystretch}{1.5}
-        \begin{tabular}{lcc}
-            & generative models & discriminative models \\
-            \hline
-            modeling & joint: $p(x,y)$ & conditional: $p(y\mid x)$ \\
-            assumption on $y$ & yes & yes \\
-            assumption on $x$ & yes & no \\
-            development & generative story & feature extractor
-        \end{tabular}
-    \end{table}
-    \pdfnote{
-        In Naive Bayes model, we used Bayes rule to get $p(y\mid x)$ given $p(x\mid y)$ and the class prior $p(y)$.
-        But one question here is, if $p(y\mid x)$ is what we are ultimately interested in, why bother modeling the data likelihood and the prior as opposed to directly modeling $p(y\mid x)$.
-    }
-\end{frame}
-
-\begin{frame}
-    {Model $p(y\mid x)$}
-    How to model $p(y\mid x)$?
-    \begin{itemize}
-        \item[] $y$ is a Bernoulli variable:
+    {Discriminative models: directly model $p(y\mid x)$}
+    \begin{wideitemize}[<+->]
+        \item $y$ is a Bernoulli variable:
             $$
             p(y\mid x) = \alpha^y (1-\alpha)^{(1-y)}
             $$
-            \pause
-        \item[] Bring in $x$:
+        \item Bring in $x$:
             $$
-            p(y\mid x) = h(x)^y (1-h(x))^{(1-y)} \quad h(x) \in [0,1]
+            p(y\mid x) = h(x)^y (1-h(x))^{(1-y)} \quad \blue<5->{h(x) \in [0,1]}
             $$
-    \end{itemize}
-
-    \medskip\pause
-    Parametrize $h(x)$ using a linear function:\\
+        \item Parametrize $h(x)$ using a linear function:
     $$
     h(x) = w\cdot \phi(x) + b \quad\quad \phi\colon \sX \rightarrow \BR^d, w\in\BR^d
     $$
+\item Problem: \blue<5->{$h(x) \in \BR$} (score)
+    \end{wideitemize}
 
-    Problem: $h(x) \in \BR$ (score)
 \end{frame}
 
 \begin{frame}
     {Logistic regression}
-    Map $w\cdot\phi(x) \in\mathbb{R}$ to a probability by the \textbf{logistic function}
+    Map $w\cdot\phi(x) \in\mathbb{R}$ to $[0,1]$ by the \textbf{logistic function}
     \vspace{-1em}
     \begin{center}
         \includegraphics[height=4cm]{figures/logistic}
@@ -1038,10 +1043,10 @@ overall good movie for anyone looking for a laugh
         x &= \p{\w{in}, \w{for}, \w{a}, \w{penny}, \w{in}, \w{for}, \w{a}, \w{pound}}
     \end{align*}
 
-    \textbf{Feature extractor}: $\phi\colon \mathcal{V}^n \rightarrow \mathbb{R}^d$.
+    \textbf{Feature extractor}: $\phi\colon \sX \rightarrow \mathbb{R}^d$.
     \pause
 
-    \textbf{Idea}: a sentence is the ``sum'' of words.
+    \textbf{BoW Idea}: a sentence is the ``sum'' of words in it.
     $$
     \phi_{\text{BoW}}(x) = \sum_{i=1}^n \phi_{\text{one-hot}}(x_i)
     $$
@@ -1119,7 +1124,7 @@ overall good movie for anyone looking for a laugh
     {N-gram features}
     Potential problems with the the BoW representation?
 
-    \pause
+    \medskip\pause
     \textbf{N-gram} features:
     \begin{center}
         \textit{in for a penny , in for a pound}
@@ -1130,6 +1135,7 @@ overall good movie for anyone looking for a laugh
         \item Trigram: in/for/a, for/a/penny, ...
     \end{itemize}
 
+    \medskip
     \think{What are the pros/cons of using higher order n-grams?}
     \pdfnote{
         BoW problem: new york, don't like
@@ -1138,8 +1144,9 @@ overall good movie for anyone looking for a laugh
 
 \begin{frame}
     {Feature extractor}
-    Logistic regression allows for richer features (what's the limitation of NB?)
+    Logistic regression allows for richer features (limitation of NB)
 
+    \medskip
     Define each feature as a function $\phi_i\colon \mathcal{X} \rightarrow \BR$.
     \begin{align*}
  \phi_1(x) &= \begin{cases}
@@ -1152,7 +1159,7 @@ overall good movie for anyone looking for a laugh
  0 & \text{otherwise}
  \end{cases} .
     \end{align*}
-    In practice, use a dictionary
+    {\bf In practice}, use a dictionary
     $$
     \texttt{feature\_vector}[\texttt{"prefix=un+suffix=ing"}] = 1
     $$
@@ -1160,6 +1167,26 @@ overall good movie for anyone looking for a laugh
         With NB, we can still include these features as variables, but we'll have to think about modeling them as a parametrized distribution and handling the sparsity problem during estimation.
     }
 \end{frame}
+
+\begin{frame}
+    {Summary}
+    \begin{table}
+        \renewcommand{\arraystretch}{1.5}
+        \begin{tabular}{lcc}
+            & generative models & discriminative models \\
+            \hline
+            modeling & joint: $p(x,y)$ & conditional: $p(y\mid x)$ \\
+            assumption on $y$ & yes & yes \\
+            assumption on $x$ & yes & no \\
+            development & generative story & feature extractor
+        \end{tabular}
+    \end{table}
+    \pdfnote{
+        In Naive Bayes model, we used Bayes rule to get $p(y\mid x)$ given $p(x\mid y)$ and the class prior $p(y)$.
+        But one question here is, if $p(y\mid x)$ is what we are ultimately interested in, why bother modeling the data likelihood and the prior as opposed to directly modeling $p(y\mid x)$.
+    }
+\end{frame}
+
 
 
 %\section{Regularization, model selection, evaluation}

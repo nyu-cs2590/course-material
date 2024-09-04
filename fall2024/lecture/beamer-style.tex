@@ -22,6 +22,8 @@
 \newcommand<>{\mgreen}[1]{{\color#2{green}#1}}
 \newcommand<>{\beamerblue}[1]{\textcolor#2{beamerblue}{#1}}
 \newcommand<>{\mbeamerblue}[1]{{\color#2{beamerblue}#1}}
+\newcommand<>{\gray}[1]{\textcolor#2{gray}{#1}}
+\newcommand<>{\mgray}[1]{{\color#2{gray}#1}}
 \newcommand{\mycite}[2][]{\href{#1}{\color{brown} #2}}
 %\newcommand{\green}[1]{\textcolor{ForestGreen}{#1}}
 %\newcommand{\red}[1]{\textcolor{red}{#1}}
@@ -45,7 +47,14 @@
 \addtobeamertemplate{block end}{}{\medskip}
 
 % itemize
-\newenvironment{wideitemize}{\itemize\addtolength{\itemsep}{5pt}}{\enditemize}
+%\newenvironment{wideitemize}{\itemize\addtolength{\itemsep}{5pt}}{\enditemize}
+\newenvironment{wideitemize}[1][]{%
+  \begin{itemize}[#1]
+  \addtolength{\itemsep}{5pt}
+}{%
+  \end{itemize}
+}
+
 \setbeamertemplate{itemize items}[circle]
 \setbeamertemplate{enumerate items}[default]
 %\setbeamerfont*{itemize/enumerate body}{size=\large}
