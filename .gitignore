@@ -8,6 +8,8 @@
 *.toc
 *.upa
 Makefile
+fall2023/*
+spring2023/*
 
 
 build/
