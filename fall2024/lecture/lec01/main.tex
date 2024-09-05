@@ -539,7 +539,7 @@
     First idea: check if the prediction is the same as the label
     \vspace{-1em}
             \begin{align}
-                L(x, y, f_w) = \1\pb{\text{sign}(f_w(x)) = y} 
+                L(x, y, f_w) = \1\pb{\text{sign}(f_w(x)) \neq y} 
                 = \1\pb{\underbrace{yf_w(x)}_{\textstyle\text{margin}}\le 0}
                 %= \1\pb{{yf_w(x)} \le 0}
             \end{align}
