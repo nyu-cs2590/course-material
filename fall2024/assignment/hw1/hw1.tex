@@ -1,0 +1,272 @@
+\documentclass{article}
+
+% box
+\usepackage{tcolorbox}
+
+%Page format
+\usepackage{pdfpages}
+\usepackage{fancyhdr}
+\usepackage{url}
+\usepackage[margin=1in]{geometry}
+
+%Math packages and custom commands
+\usepackage{framed}
+\usepackage{tikz}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{mathtools,amsthm,bbm}
+\usepackage{enumitem,amssymb}
+\newtheoremstyle{case}{}{}{}{}{}{:}{ }{}
+\theoremstyle{case}
+\newtheorem{case}{Case}
+\DeclareMathOperator{\R}{\mathbb{R}}
+\DeclareMathOperator{\E}{\mathbb{E}}
+\DeclareMathOperator{\Var}{\text{Var}}
+\DeclareMathOperator{\Cov}{\text{Cov}}
+\newcommand{\bvec}[1]{\mathbf{#1}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\norm}[2][2]{\| #2\|_{#1}}
+\newcommand\eqdef{\stackrel{\rm def}{=}} % Equal by definition
+
+\definecolor{shadecolor}{gray}{0.9}
+
+\theoremstyle{definition}
+\newtheorem*{answer}{Answer}
+\newcommand{\note}[1]{\noindent{[\textbf{NOTE:} #1]}}
+\newcommand{\hint}[1]{\noindent{[\textbf{HINT:} #1]}}
+\newcommand{\recall}[1]{\noindent{[\textbf{RECALL:} #1]}}
+
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+\newcommand{\done}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\cmark}}%
+\hspace{-2.5pt}}
+\newcommand{\wontfix}{\rlap{$\square$}{\large\hspace{1pt}\xmark}}
+
+
+\title{\textbf{DS-GA-1011: Natural Language Processing with Representation Learning, Fall 2024} \\Representing and Classifying Text}
+\author{Name \\
+NYU ID}
+\date{}
+
+\lhead{NYU ID}
+\chead{Representing and Classifying Text}
+\rhead{\today}
+\lfoot{}
+\cfoot{DS-GA-1011: Natural Language Processing with Representation Learning --- Fall 2024}
+\rfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\pagestyle{fancy}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\maketitle
+\begin{tcolorbox}
+Please write down any collaborators, AI tools (ChatGPT, Copliot, codex, etc.), and external resources you used for this assignment here. \\
+\textbf{Collaborators:} \\
+\textbf{AI tools:} \\
+\textbf{Resources:} 
+\end{tcolorbox}
+\textit{By turning in this assignment, I agree by the honor code of the College of Arts and Science at New York University and declare
+that all of this is my own work.} \\
+
+
+Welcome to your first assignment! The goal of this assignment is to get familiar with basic text classification models and explore word vectors using basic linear algebra tools.
+\textbf{Before you get started, please read the Submission section thoroughly}.
+
+\section*{Submission}
+Submission is done on Gradescope. \\
+
+\textbf{Written:} When submitting the written parts, make sure to select \textbf{all} the pages that contain part of your answer for that problem, or else you will not get credit.
+You can either directly type your solution between the \texttt{shaded} environments in the released \texttt{.tex} file,
+or write your solution using a pen or stylus. 
+A \texttt{.pdf} file must be submitted.
+
+\textbf{Programming:} Questions marked with ``coding'' next to the assigned to the points require a coding part in \texttt{submission.py}.
+Submit \texttt{submission.py} and we will run an autograder on Gradescope. You can use functions in \texttt{util.py}. However, please do not import additional libraries (e.g. \texttt{sklearn}) that aren't mentioned in the assignment, otherwise the grader may crash and no credit will be given.
+You can run \texttt{test\_classification.py} and \texttt{test\_embedding.py} to test your code but you don't need to submit it.
+
+\section*{Problem 1: Naive Bayes classifier}
+In this problem, we will study the \emph{decision boundary} of multinomial Naive Bayes model for binary text classification.
+The decision boundary is often specificed as the level set of a function:
+$\{x\in\mathcal{X} : h(x) = 0\}$,
+where $x$ for which $h(x) > 0$ is in the positive class and
+$x$ for which $h(x) < 0$ is in the negative class.
+
+\begin{enumerate}
+    \item {[2 points]} Give an expression of $h(x)$ for the Naive Bayes model $p_\theta(y\mid x)$, where $\theta$ denotes the parameters of the model.
+
+    \newpage
+\item {[3 points]} Recall that for multinomial Naive Bayes,
+        we have the input $X=(X_1, \ldots, X_n)$ where $n$ is the number of words in an example.
+        In general, $n$ changes with each example but we can ignore that for now.
+        We assume that $X_i\mid Y=y \sim \text{Categorical}(\theta_{w_1,y}, \ldots \theta_{w_m,y})$ where $Y\in \{0, 1\}$, $w_i\in\mathcal{V}$, and $m=|\mathcal{V}|$ is the vocabulary size.
+        Further, $Y\sim\text{Bernoulli}(\theta_1)$.
+        Show that the multinomial Naive Bayes model has a linear decision boundary,
+        i.e. show that $h(x)$ can be written in the form $w\cdot x + b=0$.
+        \recall{
+            The categorical distribution is a multinomial distribution with one trial.
+            Its PMF is
+            $$
+            p(x_1,\ldots, x_m) = \prod_{i=1}^m\theta_{i}^{x_i} \;,
+            $$
+            where $x_i = \mathbbm{1}[x=i]$, $\sum_{i=1}^m x_i = 1$,
+            and $\sum_{i=1}^m \theta_i = 1$.
+        }
+    
+    \newpage
+\item {[2 points]} In the above model, $X_i$ represents a single word, i.e. it's a unigram model.
+    Think of an example in text classification where the Naive Bayes assumption might be violated.
+    How would you allieviate the problem?
+
+    \newpage
+\item {[2 points]} Since the decision boundary is linear, the Naive Bayes model works well if the data is linearly separable.
+        Discuss ways to make text data works in this setting, i.e. make the data
+        more linearly separable and its influence on model generalization.
+
+\newpage
+\end{enumerate}
+
+\section*{Problem 2: Natural language inference}
+In this problem, you will build a logistic regression model for textual entailment.
+Given a \textit{premise} sentence,
+and a \textit{hypothesis} sentence,
+we would like to predict whether the hypothesis is \textit{entailed} by the premise,
+i.e. if the premise is true, then the hypothesis must be true.
+
+Example:
+\begin{center}
+    \begin{tabular}{lll}
+        label & premise & hypothesis \\
+        \hline
+        entailment & The kids are playing in the park & The kids are playing \\
+        non-entailment &The kids are playing in the park & The kids are happy 
+    \end{tabular}
+\end{center}
+
+\begin{enumerate}
+    \item {[1 point]} Given a dataset $D=\{(x^{(i)}, y^{(i)})\}_{i=1}^n$ where $y\in\{0,1\}$, let $\phi$ be the feature extractor and $w$ be the weight vector. Write the maximum log-likelihood objective as a \textit{minimization} problem.
+    \begin{shaded}
+        
+    \end{shaded}
+
+    \newpage
+    \item {[3 point, coding]} We first need to decide the features to represent $x$.
+        Implement \texttt{extract\_unigram\_features} which returns a BoW feature vector for the premise and the hypothesis.
+        \begin{shaded}
+
+        \end{shaded}
+
+    \newpage
+    \item {[2 point]} Let $\ell(w)$ be the objective you obtained above.
+    Compute the gradient of $\ell_i(w)$ given a single example $(x^{(i)}, y^{(i)})$.
+        Note that $\ell(w) = \sum_{i=1}^n \ell_i(w)$.
+        You can use $f_w(x) = \frac{1}{1 + e^{-w\cdot\phi(x)}}$
+        to simplify the expression.
+    \begin{shaded}
+        
+    \end{shaded}
+
+    \newpage
+    \item {[5 points, coding]} Use the gradient you derived above to implement \texttt{learn\_predictor}.
+        You must obtain an error rate less than 0.3 on the training set and less than 0.4 on the test set to get full credit \emph{using the unigram feature extractor}.
+        \begin{shaded}
+            
+        \end{shaded}
+
+    \newpage
+    \item {[3 points]} Discuss what are the potential problems with the unigram feature extractor
+        and describe your design of a better feature extractor. 
+        \begin{shaded}
+        \end{shaded}
+
+    \newpage
+    \item {[3 points, coding]}
+        Implement your feature extractor in \texttt{extract\_custom\_features}.
+        You must get a lower error rate on the dev set than what you got using the unigram feature extractor to get full credits.
+        \begin{shaded}
+            
+        \end{shaded}
+
+    \newpage
+\item {[3 points]} When you run the tests in \texttt{test\_classification.py}, it will output a file \texttt{error\_analysis.txt}. (You may want to take a look at the \texttt{error\_analysis} function in \texttt{util.py}).
+    Select five examples misclassified by the classifier using custom features.
+        For each example, briefly state your intuition for why the classifier got it wrong, and what information about the example will be needed to get it right.
+        \begin{shaded}
+        \end{shaded}
+
+    \newpage
+\item {[3 points]} Change \texttt{extract\_unigram\_features} such that it only extracts features from the hypothesis.
+    How does it affect the accuracy? Is this what you expected? If yes, explain why. If not, give some hypothesis for why this is happening.
+    Don't forget to change the function back before your submit. You do not need to submit your code for this part.
+        \begin{shaded}
+        \end{shaded}
+
+\end{enumerate}
+
+\newpage
+\section*{Problem 3: Word vectors}
+In this problem, you will implement functions to compute dense word vectors from a word co-occurrence matrix using SVD, and explore similarities between words.
+You will be using python packages \texttt{nltk} and \texttt{numpy} for this problem.
+
+We will estimate word vectors using the corpus \textit{Emma} by Jane Austen from \texttt{nltk}. 
+Take a look at the function \texttt{read\_corpus} in \textit{util.py} which downloads the corpus.
+
+\begin{enumerate}
+    \newpage
+    \item {[3 points, coding]} First, let's construct the word co-occurrence matrix. Implement the function \texttt{count\_cooccur\_matrix} using a window size of 4 (i.e. considering 4 words before and 4 words after the center word).
+        \begin{shaded}
+            
+        \end{shaded}
+
+    \newpage
+    \item {[1 points]} Next, let's perform dimensionality reduction on the co-occurrence matrix to obtain dense word vectors. You will implement truncated SVD using the \texttt{numpy.linalg.svd} function in the next part. Read its documentation (\url{https://numpy.org/doc/stable/reference/generated/numpy.linalg.svd.html}) carefully. Can we set \texttt{hermitian} to \texttt{True} to speed up the computation? Explain your answer in one sentence.
+
+        \begin{shaded}
+            
+        \end{shaded}
+
+    \newpage
+    \item {[3 points, coding]} Now, implement the \texttt{cooccur\_to\_embedding} function that returns word embeddings based on truncated SVD.
+        \begin{shaded}
+            
+        \end{shaded}
+
+    \newpage
+    \item {[2 points, coding]} Let's play with the word embeddings and see what they capture. In particular, we will find the most similar words to a given word. In order to do that, we need to define a similarity function between two word vectors. Dot product is one such metric. Implement it in \texttt{top\_k\_similar} (where \texttt{metric='dot'}).
+        \begin{shaded}
+            
+        \end{shaded}
+
+    \newpage
+    \item {[1 points]} Now, run \texttt{test\_embedding.py} to get the top-k words. What's your observation? Explain why that is the case.
+        \begin{shaded}
+        \end{shaded}
+
+    \newpage
+    \item {[2 points, coding]} To fix the issue, implement the cosine similarity function in \texttt{top\_k\_similar} (where \texttt{metric='cosine'}).
+        \begin{shaded}
+            
+        \end{shaded}
+
+    \newpage
+    \item {[1 points]} Among the given word list, take a look at the top-k similar words of ``man'' and ``woman'', in particular the adjectives. How do they differ? Explain what makes sense and what is surprising.
+        \begin{shaded}
+        \end{shaded}
+
+    \newpage
+    \item {[1 points]} Among the given word list, take a look at the top-k similar words of ``happy'' and ``sad''. Do they contain mostly synonyms, or antonyms, or both? What do you expect and why? 
+        \begin{shaded}
+        \end{shaded}
+
+\end{enumerate}
+
+\newpage
+
+
+
+\end{document}
