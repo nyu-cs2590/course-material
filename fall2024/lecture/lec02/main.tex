@@ -677,9 +677,9 @@
 
 \begin{frame}
     {Feature learning}
-    Linear predictor with handcrafted features: $f(x) = w\cdot\phi(x)$.
+    Linear predictor with \green{handcrafted features}: $h(x) = w\cdot\green{\phi(x)}$.
 
-    Can we learn intermediate features?
+    Can we \blue{learn features} from data?
     \pause
 
     Example:\\
@@ -689,12 +689,16 @@
     \item Decompose into subproblems:
     \begin{itemize}
         \itemsep2ex
-    \item[] ${\color{blue}h_1}(\pb{\text{\#dishes, price, wine option}}) = \text{food quality}$
-    \item[] ${\color{blue}h_2}(\pb{\text{zip code}}) = \text{walkable}$
-    \item[] ${\color{blue}h_3}(\pb{\text{\#seats, size}}) = \text{nosie}$
+        \item[] ${h_1}(\pb{\text{\#dishes, price, wine option}}) = \text{\blue{food quality}}$
+        \item[] ${h_2}(\pb{\text{zip code}}) = \text{\blue{walkable}}$
+        \item[] ${h_3}(\pb{\text{\#seats, size}}) = \text{\blue{nosie}}$
     \end{itemize}
     \end{itemize}
-
+\pdfnote{Let's try to represent our model as a graph. So we have nodes representing each input, nodes representing the intermediate predictors which takes in a subset of inputs, and the node representing the linear classifier that computes the output.}
+\pdfnote{The subproblems are manually specified based on our knowledge of the problem. 
+In fact, feature engineering is an important step when building practical ML models, but in this course so far we have ignored that part and assume they are given to use.
+But we don't always have this knowledge, or our features aren't good, or we simply want to automate as many steps as possible.
+It would be desirable if we can directly learn these subproblems.}
 \end{frame}
 
 \begin{frame}
@@ -793,7 +797,7 @@ It would be desirable if we can directly learn these subproblems.}
         \path (H-\source) edge (O);
 
     % Annotate the layers
-    \node[annot,above of=H-1, node distance=2.5cm] (hl) {\textcolor{blue}{Hidden} layer};
+    \node[annot,above of=H-1, node distance=2.5cm] (hl) {\textcolor{blue}{Hidden layer}};
     \node[annot,left of=hl] {Input layer};
     \node[annot,right of=hl, node distance=4cm] {Output layer};
     
@@ -806,7 +810,7 @@ It would be desirable if we can directly learn these subproblems.}
 
 \begin{frame}
     {Neural networks}
-\beamerblue{Key idea}: automatically learn the intermediate features.
+\textbf{Key idea}: automatically learn the intermediate features.
 
     \textbf{Feature engineering}:
 Manually specify $\phi(x)$ based on domain knowledge and learn the weights:
@@ -825,13 +829,13 @@ f(x) = {\color{red}w}^T h(x)
 \begin{frame}
 {Activation function}
 \begin{itemize}[<+->]
-\item How should we parametrize $h_i$'s? Can it be linear?
+\item How should we parametrize $h_i$'s? 
 \onslide<+->{
 \begin{align}
 h_i(x) = {\color{blue}\sigma}(v_i^T x) .
 \end{align}
 }
-\item<.-> $\sigma$ is the \emph{nonlinear} \textbf{activation function}.
+\item<.-> $\sigma$ is the \textbf{activation function}.
 \item What might be some activation functions we want to use?
 \begin{itemize}
 \item $\text{sign}$ function? \red{Non-differentiable}.
@@ -839,11 +843,12 @@ h_i(x) = {\color{blue}\sigma}(v_i^T x) .
 \begin{itemize}[<.->]
 \item E.g., logistic function, hyperbolic tangent function, ReLU
 \end{itemize}
+\item Non-linearity
 \end{itemize}
-\item Two-layer neural network (one \textcolor{blue}{hidden layer} and one  \textcolor{Green}{output layer}) with $K$ hidden units:
-\begin{align}
-f(x) &= \sum_{k=1}^{K} {\color{Green}w_k} h_k(x) = \sum_{k=1}^K {\color{Green}w_k} \sigma({\color{blue}v_k}^T x)
-\end{align}
+%\item Two-layer neural network (one \textcolor{blue}{hidden layer} and one  \textcolor{Green}{output layer}) with $K$ hidden units:
+%\begin{align}
+%f(x) &= \sum_{k=1}^{K} {\color{Green}w_k} h_k(x) = \sum_{k=1}^K {\color{Green}w_k} \sigma({\color{blue}v_k}^T x)
+%\end{align}
 \end{itemize}
 \pdfnote{Recall that $h$ is an intermediate predictor. How about the sign function such that $h$ would output the result of a binary classifier.}
 \pdfnote{Sigmoid function is S-shaped functions that approximate sign function. (draw)}
@@ -966,8 +971,6 @@ layers:
 \begin{align}
 f(x) &= \left(a\circ h^{(L)}\circ\cdots\circ h^{(1)}\right)(x)
 \end{align}
-
-\item Last layer typically gives us a score. (How to do classification?)
 \end{itemize}
 \end{frame}
 
