@@ -1,0 +1,288 @@
+\documentclass{article}
+
+% box
+\usepackage{tcolorbox}
+
+%Page format
+\usepackage{pdfpages}
+\usepackage{fancyhdr}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+
+%Math packages and custom commands
+\usepackage{framed}
+\usepackage{tikz}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{mathtools,amsthm,bbm}
+\usepackage{enumitem,amssymb}
+\newtheoremstyle{case}{}{}{}{}{}{:}{ }{}
+\theoremstyle{case}
+\newtheorem{case}{Case}
+\DeclareMathOperator{\R}{\mathbb{R}}
+\DeclareMathOperator{\E}{\mathbb{E}}
+\DeclareMathOperator{\Var}{\text{Var}}
+\DeclareMathOperator{\Cov}{\text{Cov}}
+\newcommand{\bvec}[1]{\mathbf{#1}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\norm}[2][2]{\| #2\|_{#1}}
+\newcommand\eqdef{\stackrel{\rm def}{=}} % Equal by definition
+
+\definecolor{shadecolor}{gray}{0.9}
+
+\theoremstyle{definition}
+\newtheorem*{answer}{Answer}
+\newcommand{\note}[1]{\noindent{[\textbf{NOTE:} #1]}}
+\newcommand{\hint}[1]{\noindent{[\textbf{HINT:} #1]}}
+\newcommand{\recall}[1]{\noindent{[\textbf{RECALL:} #1]}}
+
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+\newcommand{\done}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\cmark}}%
+\hspace{-2.5pt}}
+\newcommand{\wontfix}{\rlap{$\square$}{\large\hspace{1pt}\xmark}}
+
+
+\title{\textbf{DS-GA-1011: Natural Language Processing with Representation Learning, Fall 2024}\\HW2 - Machine Translation}
+
+\author{Name \\
+NYU ID}
+\date{}
+
+\lhead{NYU ID}
+\chead{Machine Translation}
+\rhead{\today}
+\lfoot{}
+\cfoot{DS-GA-1011: Natural Language Processing with Representation Learning --- Fall 2024}
+ \rfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\pagestyle{fancy}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\maketitle
+\begin{tcolorbox}
+Please write down any collaborators, AI tools (ChatGPT, Copliot, codex, etc.), and external resources you used for this assignment here. \\
+\textbf{Collaborators:} \\
+\textbf{AI tools:} \\
+\textbf{Resources:} 
+\end{tcolorbox}
+
+\textit{By turning in this assignment, I agree by the honor code of the College of Arts and Science at New York University and declare
+that all of this is my own work.} \\
+
+\textbf{Acknowledgement:} Problem 1 was developed by Yilun Kuang. Problem 2 is based off of Annotated Transformers from Sasha Rash and developed by Nitish Joshi. \\
+
+\textbf{Before you get started, please read the Submission section thoroughly}.
+
+\section*{Submission}
+Submission is done on Gradescope. \\
+
+\textbf{Written:} You can either directly type your solution in the released \texttt{.tex} file,
+or write your solution using pen or stylus. 
+A \texttt{.pdf} file must be submitted.\\
+
+\textbf{Programming:} Questions marked with ``coding'' at the start of the question require a coding part. Each question contains details of which functions you need to modify. We have also provided some unit tests for you to test your code. You should submit all \texttt{.py} files which you need to modify, along with the generated output files as mentioned in some questions. \\
+
+\textbf{Compute Budget:} For question \ref{training_time}, you should expect the total code execution time to be less than 2 hours on a single NVIDIA Quadro RTX 8000 GPU from NYU Greene HPC. Please plan ahead, as requesting GPU resources on the cluster can take several hours or even longer during peak times. \\
+
+\textbf{Due Date:} This homework is due on October 9, 2024, at noon 12pm Eastern Time.  
+
+
+\section{Recurrent Neural Network}
+In this problem, you will show the problem of vanishing and exploding gradients for Recurrent Neural Network (RNN) analytically. To show this, we will first expand the gradient of the loss function with respect to the parameters using the chain rule. Then, we will bound the norm of each individual partial derivative with matrix norm inequalities. The last step will be to collect all of the partial derivative terms and show how repeated multiplication of a single weight matrix can lead to vanishing or exploding gradients. 
+
+\subsection{RNN Derivatives}
+
+Let $S=(s_1,\cdots,s_T)$ be a sequence of input word tokens and $T$ be the sequence length. For a particular token $s_t\in \mathcal{V}$ for $1\leq t\leq T$, we can obtain its corresponding word embedding $x_t\in\mathbb{R}^{d}$ by applying equation (\ref{word_embed_func}), where $\phi_{\text{one-hot}}$ is the one-hot encoding function and $W_e$ is the word embedding matrix. \\
+
+The RNN forward pass computes the hidden state $h_t\in\mathbb{R}^{d'}$ using equation (\ref{rnn_forward}). Here $W_{\text{hh}}\in\mathbb{R}^{d'\times d'}$ is the recurrent weight matrix,  $W_{\text{ih}}\in\mathbb{R}^{d'\times d}$ is the input-to-hidden weight matrix, $b_h\in\mathbb{R}^{d'}$ is the hidden states bias vector, and $\sigma:\mathbb{R}^{d'}\to[-1,1]^{d'}$ is the tanh activation function. $W_{\text{hh}},W_{\text{ih}},b_h$ are shared across sequence index $t$.\\
+
+The output of RNN $o_t\in\mathbb{R}^{k}$ at each sequence index $t$ is given by equation (\ref{rnn_output}), where $W_{h_o}\in\mathbb{R}^{k\times d'}$ is the hidden-to-output weight matrix and $b_o\in\mathbb{R}^{k}$ is the output bias vector. For an input sequence $S=(s_1,\cdots,s_T)$, we have a corresponding sequence of RNN hidden states  $H=(h_1,\cdots,h_T)$ and outputs $O=(o_1,\cdots,o_T)$.
+
+\begin{align}
+    x_t=W_e\phi_{\text{one-hot}}(s_t)\label{word_embed_func}\\
+    h_t=\sigma(W_{\text{hh}}h_{t-1}+W_{\text{ih}}x_t+b_h)\label{rnn_forward}\\
+    o_t=W_{h_o}h_t+b_o\label{rnn_output}
+\end{align}
+
+ Let's now use this RNN model for classification.
+ In particular, we consider the last output $o_T$ to be the logits (scores for each class), which we then convert to the class probability vector $p_T\in[0,1]^{k}$ by $p_T=g(W_{h_o}h_T+b_o)$ where $g(\cdot)$ is the softmax function and $\|p_T\|_1=1$.
+ 
+
+
+
+\begin{enumerate}
+    \item (1 point, written) Write down the per-example cross-entropy loss $\ell(y, p_T)$ for the classification task. Here $y\in\{0,1\}^k$ is a one-hot vector of the label and  $p_T$ is the class probability vector where $p_T[i] = p(y[i]=1\mid S)$ for $i=1,\ldots, k$. ($[i]$ denotes the $i$-th entry of the corresponding vector.)
+    
+    \newpage
+    \item 
+    To perform backpropagation, we need to compute the derivative of the loss with respect to each parameter.
+    Without loss of generality, let's consider the derivative with respect to a single parameter $w=W_{\text{hh}}[i,j]$ where $[i,j]$ denotes the $(i,j)$-th entry of the matrix. By chain rule, we have
+    \begin{align}
+        \frac{\partial\ell}{\partial w} = \frac{\partial\ell}{\partial o_t}
+    \frac{\partial o_t}{\partial h_t}
+    \frac{\partial h_t}{\partial w}
+    \label{eqn:dldw}
+    \end{align}
+    
+    Note that the first two derivatives in the \ref{eqn:dldw} are easy to compute,
+    so let's focus on the last term $\frac{\partial h_t}{\partial w}$.
+    During the lecture, we have shown that
+    \begin{align}
+        \frac{\partial h_t}{\partial w} = \sum_{i=1}^t \frac{\partial h_t}{\partial h_i} \frac{\partial h_i^+}{\partial w}\label{eqn:dhdw}
+    \end{align}
+    Here $\frac{\partial h_i^+}{\partial w}$ denotes the ``immediate'' gradient where $h_{i-1}$ is taken as a constant.
+
+    \begin{enumerate}
+        \item (1 point, written)
+        Give an expression for $\frac{\partial h_i^+}{\partial w}$.
+
+        \newpage
+        \item (2 points, written)
+        Expand the gradient vector $\frac{\partial h_t}{\partial h_i}$ using the chain rule as a product of partial derivatives of one hidden state with respect to the previous hidden state. You do not need to explicitly do differentiations beyond that. 
+
+    \end{enumerate}
+    
+    
+    
+    \newpage
+    \item (2 points, written) Now let's further expand one of the partial derivatives from the previous question. Write down the Jacobian matrix $\frac{\partial h_{i+1}}{\partial h_{i}}$ by rules of differentiations. 
+    You can directly use $\sigma'$ as the derivative of the activateion function in the expression.
+\end{enumerate}
+
+\newpage
+\subsection{Bounding Gradient Norm}
+To determine if the gradient will vanish or explode,
+we need a notion of magnitude. For the Jacobian matrix, we can use the induced matrix norm (or operator norm). For this question, we use the spectral norm $\|A\|_2=\sqrt{\lambda_{\max}(A^\top A)}=s_{\max}(A)$ for a matrix $A\in\mathbb{R}^{m\times n}$. Here $\lambda_{\max}(A^\top A)$ denotes the maximum eigenvalue of the matrix $A^\top A$ and $s_{\max}(A)$ denotes the maximum singular value of the matrix $A$. You can learn more about matrix norms at this \href{https://en.wikipedia.org/wiki/Matrix_norm}{Wikipedia entry}.
+
+Now, to determine if the gradient $\frac{\partial \ell}{\partial w}$ will vanish or explode, we can focus on $\|\frac{\partial h_t}{\partial h_{i}}\|$.
+ Note that if $\|\frac{\partial h_t}{\partial h_{i}}\|$ vanishes or explodes, $\|\frac{\partial \ell}{\partial w}\|$ also vanishes or explodes based on (\ref{eqn:dldw}) and (\ref{eqn:dhdw}). 
+
+
+\begin{enumerate}
+
+    \item (2 points, written)  Given the mathematical form of the Jacobian matrix $\frac{\partial h_{i+1}}{\partial h_{i}}$ we derived earlier, we can now bound the norm of the Jacobian with the following matrix norm inequality 
+        \begin{align}
+            \|AB\|_2\leq\|A\|_2\cdot\|B\|_2
+        \end{align}
+    for matrices $A, B$ with matched shapes. Write down a bound for $\bigg\|\frac{\partial h_{i}}{\partial h_{i-1}}\bigg\|_2.$
+
+
+    \newpage
+    \item (4 points, written) Now we have all the pieces we need. Derive a bound on the gradient norm $\|\frac{\partial h_t}{\partial h_{i}}\|$. Explain how the magnitude of the maximum singular value of $W_{\text{hh}}$ can lead to either vanishing or exploding gradient problems. \hint{You can use the fact that for the $\tanh$ activation function $\sigma(\cdot)$, the derivative $\sigma'(\cdot)$ is always less than or equal to 1.}
+    
+
+    \newpage
+    \item (1 point, written) Propose one way to get around the vanishing and exploding gradient problem.
+\end{enumerate}
+
+\newpage
+\section{Machine Translation}
+
+The goal of this homework is to build a machine translation system using sequence-to-sequence transformer models \url{https://arxiv.org/abs/1706.03762}. More specifically, you will build a system which translates German to English using the Multi30k dataset (\url{https://arxiv.org/abs/1605.00459}) You are provided with a code skeleton, which clearly marks out where you need to fill in code for each sub-question.\\
+
+First go through the file \texttt{README.md} to set up the environment required for the class.
+
+\subsection{Attention}
+
+Transformers use scaled dot-product attention --- given a set of queries $Q$ (each of dimension $d_k$), a set of keys $K$ (also each dimension $d_k$), and a set of values $V$ (each of dimension $d_v$), the output is a weighted sum of the values. More specifically,
+
+    \begin{align}
+        \text{Attention}(Q, K, V) = \text{softmax}(\frac{QK^T}{\sqrt{d_k}})V
+    \end{align}
+
+    Note that each of $Q, K, V$ is a matrix of vectors packed together.
+
+\begin{enumerate}
+
+    \item (2 points, written) The above function is called 'scaled' attention due to the scaling factor $\frac{1}{\sqrt{d_k}}$. The original transformers paper mentions that this is needed because dot products between keys and queries get large with larger $d_k$.
+    
+    For a query $q$ and key $k$ both of dimension $d_k$ and each component being an independent random variable with mean 0 and variance 1, compute the mean and variance (with steps) of the dot product $q.k$ to demonstrate the point.
+
+    \newpage
+    \item (2 points, coding) Implement the above scaled dot-product attention in the \texttt{attention()} function present in \texttt{layers.py}. You can test the implementation after the next part.
+
+
+    \newpage
+    \item (2 point, coding) In this part, you will modify the \texttt{attention()} function by making use of the parameters \texttt{mask} and \texttt{dropout} which were input to the function. The \texttt{mask} indicates positions where the attention values should be zero (e.g. when we have padded a sentence of length 5 to length 10, we do not want to attend to the extra tokens). \texttt{dropout} should be applied to the attention weights for regularization.
+
+    To test the implementation against some unit tests, run \texttt{python3 test.py --attention.}
+
+
+    \newpage
+    \item (3 points, coding) Instead of a single attention function, transformers use multi-headed attention function. For original keys, queries and values (each of dimension say $d_{model}$), we use $h$ different projection matrices to obtain queries, keys and values of dimensions $d_k, d_k$ and $d_v$ respectively. Implement the function \texttt{MultiHeadedAttention()} in \texttt{layers.py}. To test the implementation against some unit tests, run \texttt{python3 test.py --multiheaded\_attention.}
+
+    
+\end{enumerate}
+
+\newpage
+\subsection{Positional Encoding}
+
+Since the underlying blocks in a transformer (namely attention and feed forward layers) do not encode any information about the order of the input tokens, transformers use `positional encodings' which are added to the input embeddings. If $d_{model}$ is the dimension of the input embeddings, $pos$ is the position, and $i$ is the dimension, then the encoding is defined as:
+
+\begin{align}
+    PE_{(pos, 2i)} = sin(pos/10000^{2i/d_{model}})\\
+    PE_{(pos, 2i+1)} = cos(pos/10000^{2i/d_{model}})
+\end{align}
+
+\begin{enumerate}
+    \item (2 points, written) Since the objective of the positional encoding is to add information about the position, can we simply use $PE_{pos} = sin(pos)$ as the positional encoding for $pos$ position? Why or why not?
+
+
+    \newpage
+    \item (2 points, coding) Implement the above positional encoding in the function \texttt{PositionalEncoding()} in the file \texttt{utils.py}. To test the implementation against some unit tests, run \texttt{python3 test.py --positional\_encoding.}
+
+    
+\end{enumerate}
+
+
+\newpage
+\subsection{Training}\label{training_time}
+
+\begin{enumerate}
+    
+    \item (2 points, written) The above questions should complete the missing parts in the training code and we can now train a machine translation system!
+    
+    Use the command \texttt{python3 main.py} to train your model. For the purpose of this homework, you are not required to tune any hyperparameters. You should submit the generated \texttt{out\_greedy.txt} file containing outputs. You must obtain a BLEU score of atleast 35 for full points (By default we are using BLEU-4 for this and all subsequent questions).
+
+    
+\end{enumerate}
+
+
+\newpage
+\subsection{Decoding \& Evaluation}
+
+In the previous question, the code uses the default \texttt{greedy\_decode()} to decode the output.  In practice, people use algorithms such as beam search decoding, which have been shown to give better quality outputs. (Note: In the following questions, use a model trained with the default i.e. given hyperparameters)
+
+\begin{enumerate}
+
+    \item (2 points, written) In the file \texttt{utils.py} you will notice a function \texttt{subsequent\_mask()}. What does that function do and why is it required in our model?
+
+    \newpage
+    \item (5 points, coding) Implement the \texttt{beam\_search()} function in \texttt{utils.py}. We have provided the main skeleton for this function and you are only required to fill in the important parts (more details in the code). You can run the code using the arguments \texttt{--beam\_search} and \texttt{--beam\_size}. You should submit the generated file \texttt{out\_beam.txt} when \texttt{beam\_size = 2}.
+    
+    To test the implementation against some unit tests, run \texttt{python3 test.py --beam\_search.}
+    
+
+    \newpage
+    \item (3 points, written) For the model trained in question 1.3, plot the BLEU score as a function of beam size. You should plot the output from beam size 1 to 5. Is the trend as expected? Explain your answer.
+
+
+    \newpage
+    \item (2 points, written) You might notice that some of the sentences contain the `$\langle$unk$\rangle$' token which denotes a word not in the vocabulary. For systems such as Google Translate, you might not want such tokens in the outputs seen by the user. Describe a potential way to avoid (or reduce) the occurrence of these tokens in the output.
+
+
+    \newpage
+    \item (2 points, written) In this homework, you have been using BLEU score as your evaluation metric. Consider an example where the reference translation is "I just went to the mall to buy a table.", and consider two possible model generations: "I just went to the mall to buy a knife." and "I just went to the mall to buy a desk.". Which one will BLEU score higher? Suggest a potential fix if it does not score the intended one higher.
+
+    
+\end{enumerate}
+
+
+\end{document}
