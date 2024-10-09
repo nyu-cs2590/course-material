@@ -1,0 +1,222 @@
+\documentclass{article}
+
+% box
+\usepackage{tcolorbox}
+
+
+%Page format
+\usepackage{pdfpages}
+\usepackage{fancyhdr}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+
+%Math packages and custom commands
+\usepackage{framed}
+\usepackage{tikz}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{mathtools,amsthm,bbm}
+\usepackage{enumitem,amssymb}
+\newtheoremstyle{case}{}{}{}{}{}{:}{ }{}
+\theoremstyle{case}
+\newtheorem{case}{Case}
+\DeclareMathOperator{\R}{\mathbb{R}}
+\DeclareMathOperator{\E}{\mathbb{E}}
+\DeclareMathOperator{\Var}{\text{Var}}
+\DeclareMathOperator{\Cov}{\text{Cov}}
+\newcommand{\bvec}[1]{\mathbf{#1}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\norm}[2][2]{\| #2\|_{#1}}
+\newcommand\eqdef{\stackrel{\rm def}{=}} % Equal by definition
+
+\definecolor{shadecolor}{gray}{0.9}
+
+\theoremstyle{definition}
+\newtheorem*{answer}{Answer}
+\newcommand{\note}[1]{\noindent{[\textbf{NOTE:} #1]}}
+\newcommand{\hint}[1]{\noindent{[\textbf{HINT:} #1]}}
+\newcommand{\recall}[1]{\noindent{[\textbf{RECALL:} #1]}}
+
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+\newcommand{\done}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\cmark}}%
+\hspace{-2.5pt}}
+\newcommand{\wontfix}{\rlap{$\square$}{\large\hspace{1pt}\xmark}}
+
+
+\title{\textbf{DS-GA-1011: Natural Language Processing with Representation Learning, Fall 2024} \\HW3 - Fine-tuning Language Models}
+\author{Name \\
+NYU ID}
+\date{}
+
+\lhead{NYU ID}
+\chead{Fine-tuning Language Models}
+\rhead{\today}
+\lfoot{}
+\cfoot{DS-GA-1011: Natural Language Processing with Representation Learning --- Fall 2024}
+\rfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\pagestyle{fancy}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\maketitle
+
+\begin{tcolorbox}
+Please write down any collaborators, AI tools (ChatGPT, Copliot, codex, etc.), and external resources you used for this assignment here. \\
+\textbf{Collaborators:} \\
+\textbf{AI tools:} \\
+\textbf{Resources:}
+\end{tcolorbox}
+\textit{By turning in this assignment, I agree by the honor code of the College of Arts and Science at New York University and declare
+that all of this is my own work.} \\
+
+\textbf{Acknowledgement:} This HW draws inspiration from ``NL-Augmenter'', which can be accessed at \url{https://arxiv.org/abs/2112.02721}. Also acknowledgement to Nitish Joshi for his invaluable contributions to the initial version of the problems presented in this assignment. \\
+
+
+\textbf{Before you get started, please read the Submission section thoroughly}.
+
+\section*{Submission}
+Submission is done on Gradescope. \\
+
+\textbf{Written:} You can either directly type your solution in the released \texttt{.tex} file,
+or write your solution using pen or stylus.
+A \texttt{.pdf} file must be submitted.\\
+
+\textbf{Programming:} Questions marked with ``coding'' at the start of the question require a coding part. Each question contains details of which functions you need to modify. You should submit all \texttt{.py} files which you need to modify, along with the generated output files as mentioned in some questions. \\
+
+\textbf{Due Data:} This homework is due on October 30, 2024, at 12 pm Eastern Time.
+
+\section*{Fine-tuning Language Models}
+
+The goal of this homework is to get familiar with how to fine-tune language models for a specific task, and understand the challenges involved in it. More specifically, we will first fine-tune a BERT-base model for sentiment analysis using the IMDB dataset.\\
+
+
+Next, we will look at one of the assumptions commonly made in supervised learning --- we often assume \emph{i.i.d.} (independent and identically distributed) test distribution i.e. the test data is drawn from the same distribution as the training data (when we create random splits). But this assumption may not always hold in practice e.g. there could be certain features specific to that dataset which won't work for other examples of the same task. The main objective in this homework will be creating transformations of the dataset as out-of-distribution (OOD) data, and evaluate your fine-tuned model on this transformed dataset. The aim will be to construct transformations which are ``reasonable'' (e.g. something we can actually expect at test time) but not very trivial.\\
+
+First go through the file \texttt{README.md} to set up the environment required for the class.
+
+\subsection*{1. Fine-tuning}
+
+As mentioned above, you will first write code to fine-tune a BERT model on the IMDB dataset for sentiment analysis. This dataset is a large sentiment anlaysis dataset based on movie reviews on IMDB. You can find more details here - \url{https://huggingface.co/datasets/imdb}.
+
+You will require GPUs for this HW.
+
+\begin{enumerate}
+    \item (4 points, coding) We have provided a template for running your code to fine-tune BERT, but it contains some missing parts. Complete the missing parts in \texttt{do\_train} function in \texttt{main.py}, which mainly includes running the training loop. You are not required to modify any hyperparameters.
+
+    \textbf{Initial Testing}: Before proceeding, test your training loop on a small subset of the data to verify its correctness. Use the following command:
+    \texttt{python3 main.py --train --eval --debug\_train}. Upon successful execution, you should achieve an accuracy of more than 88\% on this small subset. (Estimated time: \texttt{7 min} train + \texttt{1 min} eval)
+
+\textbf{Full Training and Evaluation}: Once you have confirmed that your training loop is functioning as expected, fine-tune BERT on the full training data and evaluate its performance on the test data using the command: \texttt{python3 main.py --train --eval}. An accuracy of more than 91\% on the test data is required to earn full points. (Estimated time: \texttt{40 min} train + \texttt{5 min} eval)
+
+\textbf{Submission}: Please submit the output file \texttt{out\_original.txt} generated from the full training and evaluation step.
+
+
+
+    % \begin{shaded}
+
+    % \end{shaded}
+
+
+\end{enumerate}
+
+\newpage
+\subsection*{2. Transformations}
+
+In this part you will design transformations of the evaluation dataset which will serve as out-of-distribution (OOD) evaluation for models.  These transformations should be designed so that in most cases, the new transformed example has the \emph{same label} as original example --- a human would assign the same label to original and transformed example. e.g. For an original movie review ``Titanic is the best movie I have ever seen.'', a transformation which maintains the label is ``Titanic is the best film I have ever seen.''.
+
+\begin{enumerate}
+    \item (3 points, written) Design a transformation of the dataset, and explain the details of what it does. You should also include why that is a ``reasonable'' transformation i.e. something which could potentially be an input at test time from a user.
+
+    \textbf{Examples \& Guidelines} Suitable transformations might include:
+    \begin{itemize}
+        \item Randomly replacing words in a sentence with their synonyms.
+        \item Introducing typos into sentences.
+    \end{itemize}
+
+   An example of an ``unreasonable'' transformation is converting coherent words into random gibberish, such as changing ``The soup was hot.'' to ``The unnjk rxasqwer hot.''. We've provided code guidelines for two transformations (synonym replacement and typo introduction). You can choose to utilize these or feel free to design a unique transformation of your own.
+
+   \textbf{Judgment} Determining whether a transformation is ``reasonable'' can be subjective. However, please exercise your best judgment. While we will be fairly flexible with the definition of ``reasonable'', extreme transformations like the gibberish example mentioned will not be accepted.
+
+    % Uncomment the following and write your answer below
+    % \begin{shaded}
+
+    % \end{shaded}
+
+    \newpage
+    \item (6 points, coding) Implement the transformation that you designed in the previous part.
+
+    \textbf{Setup}:  We've provided an example transformation function named \texttt{example\_transform}. Your task is to use this as a reference and complete the function \texttt{custom\_transform} found in the \texttt{utils.py} file.
+
+    \textbf{Debugging}: To ensure that your transformation is working as expected and to see a few examples of the transformed text, use the following command: \texttt{python3 main.py --eval\_transformed --debug\_transformation}
+
+    \textbf{Evaluation}  To assess the performance of the trained model on your transformed test set, execute: \texttt{python3 main.py --eval\_transformed} (Estimated time: \texttt{5 min} eval)
+
+    Your grade will be determined based on the decrease in performance on the transformed test set in comparison to the original test set:
+    \begin{itemize}
+        \item A decrease in accuracy of up to 4 points will grant you partial credit (3 out of the total 6 points).
+        \item A decrease in accuracy of more than 4 points will award you the full 6 points.
+    \end{itemize}
+    \textbf{Submission}: Please submit the output file \texttt{out\_transformed.txt} generated from the evaluation step.
+
+    % \begin{shaded}
+
+    % \end{shaded}
+
+\end{enumerate}
+
+\newpage
+\subsection*{3. Data Augmentation}
+
+In this part, you will learn one simple way to improve performance on the transformed test set, according to the transformation you have defined.
+
+\begin{enumerate}
+    \item (3 points, coding) One simple way to potentially improve performance on the transformed test set is to apply a similar transformation to the training data, and train your model on a combination of the original data and transformed training data. This method is usually known as data augmentation. In this part, you will augment the original training data with 5,000 random transformed examples, to create a new augmented training dataset. Fill in \texttt{create\_augmented\_dataloader} in \texttt{main.py} to complete the code.
+
+    \textbf{Training \& Evaluation} Train a model using this augmented data by executing the following command: \texttt{python3 main.py --train\_augmented --eval\_transformed} (Estimated time: \texttt{50 min} train + \texttt{5 min} eval)
+
+    % \begin{shaded}
+
+    % \end{shaded}
+
+    \newpage
+    \item (4 points, written) In this task, you will evaluate the performance of the above trained model. Your objective is to assess how the data augmentation affects the model's ability to handle both original and transformed test data.
+
+
+    \textbf{Evaluation on Original Test Data} Execute the following command to evaluate the model's performance on the original test data:
+    \texttt{python3 main.py --eval --model\_dir out\_augmented} (Estimated time: \texttt{5 min} eval)
+
+    \textbf{Evaluation on Transformed Test Data} Use the command below to assess how the model performs on the transformed test data: \texttt{python3 main.py --eval\_transformed --model\_dir out\_augmented} (Estimated time: \texttt{5 min} eval)
+
+    \textbf{Report \& Analysis}
+    \begin{itemize}
+        \item Report the accuracy values for both the original and transformed test data evaluations.
+        \item Analyze and discuss the following: (1) Did the model's performance on the transformed test data improve after applying data augmentation? (2) How did data augmentation affect the model's performance on the original test data? Did it enhance or diminish its accuracy?
+        \item Offer an intuitive explanation for the observed results, considering the impact of data augmentation on model training.
+    \end{itemize}
+
+    \textbf{Submission} Please submit the following output files obtained after running model evaluation on both data: \texttt{out\_augmented\_original.txt} and  \texttt{out\_augmented\_transformed.txt}.
+
+    % Uncomment the following to answer
+    % \begin{shaded}
+
+    % \end{shaded}
+
+    \newpage
+    \item (2 points, written) Explain one limitation of the data augmentation approach used here to improve performance on out-of-distribution (OOD) test sets.
+
+    % \begin{shaded}
+
+    % \end{shaded}
+
+
+\end{enumerate}
+
+
+\end{document}
