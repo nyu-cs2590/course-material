@@ -1,0 +1,423 @@
+\documentclass[usenames,dvipsnames,11pt,aspectratio=169]{beamer}
+\usepackage{ifthen}
+\usepackage{xcolor}
+\usepackage{pgfplots}
+\usepackage{amsmath}
+\usepackage{centernot}
+\usepackage{pifont}
+\usepackage{tabularx}
+\usepackage{makecell}
+\usepackage{cuted}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage{setspace}
+\usepackage{xspace}
+\usepackage{tikz}
+\usepackage{pdfcomment}
+\newcommand{\pdfnote}[1]{\marginnote{\pdfcomment[icon=note]{#1}}}
+%\newcommand{\pdfnote}[1]{}
+
+\usepackage{pgfpages}
+%\setbeameroption{show notes on second screen}
+
+
+\input ../beamer-style
+\input ../std-macros
+\input ../macros
+
+\AtBeginSection[]
+{
+    \begin{frame}
+        \frametitle{Table of Contents}
+        \tableofcontents[currentsection]
+    \end{frame}
+}
+\parskip=10pt
+
+\title[CSCI-GA.2590]{Report Writing and Presentation}
+\author[He He]{He He
+}
+\institute[NYU]{New York University}
+\date{April 18, 2023}
+
+\begin{document}
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}
+    {Logistics}
+
+    Project presentation (10\%): in class on May 2\\
+    \begin{itemize}
+        \item Format: 3 minute talk and 1 minute Q\&A with the audience
+        \item Recording: slides should be shared through Zoom
+        \item Grading (10\%):
+            \begin{itemize}
+                \item Clarity (problem 2\% + approach 3\% + evaluation 2\%)
+                \item Style (clean an legible slides) (2\%)
+                \item Q\&A (1\%)
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Logistics}
+    Report (30\%): due on May 5\\
+    \begin{itemize}
+        \item Each group only needs to submit one report on Gradescope
+        \item Format: 
+            \begin{itemize}
+                \item Page limit: 4
+                \item File format: .pdf
+                \item Style: ACL format (see templates on website)
+            \end{itemize}
+        \item Grading (30\%):
+            \begin{itemize}
+                \item Format (2\%)
+                \item Clarity (6\%)
+                \item Literature survey (4\%)
+                \item Technical content (10\%) 
+                \item Evaluation (8\%)
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Write the paper first}
+    Jason Eisner's advice: \url{http://www.cs.jhu.edu/~jason/advice/write-the-paper-first.html}
+
+    Writing is not just translating thinking into words; it is part of the thinking.
+    \begin{itemize}
+        \item Writing is the best use of limited time
+            \begin{itemize}
+                \item The audience only pays attention as far as they can understand
+                \item The idea (the writeup) is often more useful than the software
+            \end{itemize}
+        \pause
+        \item Writing helps you plan what to do next 
+            \begin{itemize}
+                \item Writing things down forces you to come up with a coherent story 
+                \item It helps you see the holes in your logic (if you are honest)  
+            \end{itemize}
+        \pause
+        \item Writing makes collaboration easier
+            \begin{itemize}
+                \item Meetings are more effective
+                \item Someone can continue to work from where you left 
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Typical structure of an NLP paper/talk}
+    \begin{enumerate}
+        \item \textbf{Title}: a precise summary of the paper's contribution
+        \item \textbf{Abstract}: high-level overview of the paper
+        \item \textbf{Introduction}: extended abstract
+        \item \textbf{Method}: 
+            \begin{enumerate}
+                \item Problem statement: formulation of the problem
+                \item Approach: technical details of your method
+            \end{enumerate}
+        \item \textbf{Experiments}:
+            \begin{enumerate}
+                \item Setup: data, baselines, hyperparameters etc.
+                \item Results: report all results (positive or negative)
+                \item Analysis: how should one read the results 
+            \end{enumerate}
+        \item \textbf{Related work} (may also come after intro): prior approaches to the problem
+        \item \textbf{Conclusion}: summarize the highlights and point out future directions
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}
+    {Title}
+    \begin{itemize}
+        \item Used as an index to retrieve or refer to the paper
+        \item Be precise and specific
+            \begin{itemize}
+                \item Too generic: ``A New Model for Image Caption Generation''
+                \item Better: ``Neural Image Caption Generation with Visual Attention''
+                \item Think about the keywords your audience might put in the search bar
+            \end{itemize}
+        \item Don't overclaim your contribution
+        \item It's nice to have a catchy phrase but don't force it 
+            \begin{itemize}
+                \item Include it only if it's relevant and delivers the key message
+                \item Good examples: \\
+                    ``\emph{Show, Attend and Tell}: Neural Image Caption Generation with Visual Attention''\\
+                    ``\emph{Know What You Don't Know}: Unanswerable Questions for SQuAD''
+                \item Often a precise, ``plain'' title is good enough
+            \end{itemize}
+        \item Avoid extra formatting 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Abstract}
+        Include all key messages: abstract has the most number of readers! \\
+            \begin{enumerate}
+                \item \textbf{The problem}:
+                    \begin{enumerate}
+                        \item The general topic: {\footnotesize``Deep Neural Networks (DNNs) are powerful models that have achieved excellent performance on difficult learning tasks.''}\\
+                        \item The specific problem: {\footnotesize ``Although DNNs work well whenever large labeled training sets are available, they cannot be used to map sequences to sequences.''}
+                    \end{enumerate}
+                \item \textbf{Your contribution}: \\
+                    \begin{enumerate}
+                        \item One-sentence summary: {\footnotesize``In this paper, we present a general end-to-end approach to sequence learning that makes minimal assumptions on the sequence structure.''}\\
+                        \item Your method: {\footnotesize ``Our method uses a multilayered Long Short-Term Memory (LSTM) to map the input sequence to a vector...''}\\
+                        \item Impact/results: {\footnotesize ``Our main result is that on an English to French translation task from the WMT-14 dataset...''}
+                    \end{enumerate}
+            \end{enumerate}
+\end{frame}
+
+\begin{frame}
+    {Introduction}
+    Follow the same structure as the abstract but with more details\\
+    \begin{enumerate}
+        \item {\bf The problem}: context, motivation, important related work 
+        \item {\bf Your approach}: \blue{intuition}, high-level description
+        \item {\bf Results}: summary of experimental results, \blue{takeaways}
+    \end{enumerate}
+    \begin{itemize}
+        \item Don't spend too much space on general introduction and related work. The reader should know what you did by the second paragraph.
+        \item Use \blue{examples and figures} to illustrate your method.
+        \item All claims should be supported by experiments/theories/analysis/citations.
+        \item Use \blue{forward reference}:\\
+            ``Our algorithm has linear time complexity at inference time \blue{(Section 2.1)}.''
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Approach}
+    \begin{itemize}
+        \item Many different ways to structure the section depending on the content 
+        \item Top down
+            \begin{itemize}
+                \item A documentation of your final method: ``Our model consists of three components: A, B, C.''.
+                \item Easier to write but hard to read: where does each component come from?
+            \end{itemize}
+        \item Bottom up
+            \begin{itemize}
+                \item \blue{Build up the method} as if the readers are developing the method with you\\
+                    ``A really simple way to solve the problme is to use A.''\\
+                    ``However, it doesn't consider X, so we add B.''\\
+                    ``To further improve Y, we add C.''
+                \item By the time the reader finishes reading, they should think: ``This is obvious! I could have come up with the idea''.
+            \end{itemize}
+        \item Often a mix of the two
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Approach}
+    General suggestions:\\
+    \begin{itemize}
+        \item Always give \blue{high-level ideas and intuitions} before go into technical details
+        \item Put the ``\blue{why}'' before the ``how''
+        \item Use running \blue{examples} when illustrating complex concepts or procedures
+        \item Notations and terminologies should be \blue{consistent} throughout the paper
+        \item Use equations only when it adds additional information.
+            \begin{itemize}
+                \item Sometimes an idea can be described precisely in words.
+                \item Even when you do need an equation, decribing it in words first is helpful.
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Experiments}
+    \begin{itemize}
+        \item {\bf Setup}: datasets, metrics, baselines
+        \item {\bf Implementation details}: preprocessing, hyperparameters of the model and the algorithm
+        \item {\bf Results}:
+            \begin{itemize}
+                \item Full results are often shown in tables and charts.
+                \item In the main text, highlight important numbers and \blue{takeaways}.
+            \end{itemize}
+        \item {\bf Analysis}: provides better understanding of the results, e.g.
+            \begin{itemize}
+                \item Ablation study of the model: are all components equally important?
+                \item Error analysis: what are the limitations of the method?
+                \item If the results are negative: what are possible reasons?\\
+                    (Often there is a mismatch between the assumptions you made and the data.)
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Related work}
+    If some work directly motivates your work, it should go into the intro. E.g. you are\\
+    \begin{itemize}
+        \item extending a previous work,
+        \item applying a prior method to your problem.
+    \end{itemize}
+
+    Why put related work at the end?\\
+    \begin{itemize}
+        \item The reader has not gained a good understanding of the problem and your approach to make judgments after the introduction.
+        \item It breaks the flow from the introduction to the approach.
+        \item It provides an overview of the area and transitions well to the conclusion.
+    \end{itemize}
+
+    Don't just survey the area; describe \blue{how your work situates in the broader context}.
+\end{frame}
+
+\begin{frame}
+    {Conclusion}
+    \begin{itemize}
+        \item Highlight the key findings from your work.
+        \item Here is the place where you can take some freedom to state your opinions
+            \begin{itemize}
+                \item What are the limitations of your approach?
+                \item What are the important next steps?
+                \item What are promising future directions for the problem?
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {General suggestion}
+    \begin{itemize}
+        \item Think about the key message you want to deliver and ``repeating'' it throughout the paper.
+        \item Put yourself in the reader's shoes.
+        \item Get feedback from people who are less familiar with your work.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Talks vs papers}
+    \begin{itemize}
+        \item The talk mirrors the paper so much of the advice still applies.
+        \item But, the talk contains \emph{much fewer details}.\\
+            The paper is similar to the manual of a tool,
+            while the talk is your explanation of how to use the tool.
+        \item You have more freedom on how to communicate in the talk
+            \begin{itemize}
+                \item Use \blue{visual aids}: video/audio/animation, memes/stories etc.
+                \item \blue{Interact} with the audience (ask questions, voting, demo)
+            \end{itemize}
+        \item Purpose of the talk
+        \begin{itemize}
+            \item Convey the key idea of your paper (so that they will go read it)
+            \item Entertaining (it's a performance)
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Giving the talk}
+    General advice\\
+    \begin{itemize}
+        \item Number one mistake to avoid: \textcolor{red}{go over the time limit}\\
+            (Generally, prepare $n$ slides for an $n$-minute talk.)
+        \item Know your opening sentences by heart (the rest will be easy)
+        \item Use a lot of \blue{examples}, especially given limited time
+        \item Be brief on related work (they may be mentioned during Q\&A)
+    \end{itemize}
+    For the project presentation\\
+    \begin{itemize}
+        \item You only have 3 minutes: practice is important!  
+        \item If more than one member will be presenting, practice the transition.
+        \item Test audio and screen sharing to avoid technical issues.
+        \item Suggested structure:\\
+            problem/motivation, key ideas, evaluation, conclusion (1 slide each)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Opening}
+    Main goal: engage the audience\\
+    \begin{itemize}
+        \item What is the problem? (Audience: what's this about?)
+        \item Why is it important? (Audience: why should I care?)
+        \item What's the challenge? (Audience: this is not trivial?)
+    \end{itemize}
+    They should be excited to hear your approach by now.
+
+    Be creative: use examples, data, quotes, anecdotes etc.
+\end{frame}
+
+\begin{frame}
+    {Key ideas}
+    \begin{itemize}
+        \item \emph{Use the bottom-up strategy}: solve the puzzle with the audience. \\
+                It doesn't have to follow how you actually solved the problem,
+                but there should be a story to connect all the pieces.
+            \item \emph{Think about what the audience may be wondering}: ask a question, then answer it. \\
+            ``Now, how do we optimize it given that the expectation is intractable? We use ...''
+        \item \emph{Leave the details to the paper}: what is the minimal set of things they need to understand?
+        \item \emph{Create references} to your key ideas/concepts.
+            \begin{itemize}
+                \item Use icons, figures, running examples, toy problems, analogies etc.
+                \item This should be in their head when they retrieve your idea.
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Results}
+    \begin{itemize}
+        \item Don't paste a wall of numbers. Use bar charts.
+        \item Guide the audience on where they should pay attention.
+        \item Put an explicit takeaway/tagline for each result you show.
+        \item Think about it as a sequence of question and answers.\\
+            ``How well does the approach work on benchmark A?''\\
+            ``What about a different domain?''\\
+            ``Is component B really necessary?''\\
+            ``How fast is the inference?''
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Conclusion}
+    \begin{itemize}
+        \item Acknowledgement to collaborators.
+        \item Show the takeaway messages you want the audience to leave with.
+        \item Show the highlights/summary of the talk to start Q\&A. 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Style}
+    Basics\\
+    \begin{itemize}
+        \item Font: sans-serif; sizes: 24+.
+        \item Number slides (for easy reference during Q\&A).
+    \end{itemize}
+
+    Layout\\
+    \begin{itemize}
+        \item Avoid clutter, wordiness (and full sentences).\\
+              The lecture slides are bad examples (because it's used both for the talk and for reference).
+        \item Use keywords, diagrams, figures: the audience should pay attention to \textit{you}, not the slides.
+        \item If the content is complex, use animation to reveal the full slide.
+    \end{itemize}
+
+    Visual guidance\\ 
+    \begin{itemize}
+        \item Color coding should be consistent throughout the presentation.
+        \item Use arrows and boxes to help the audience read figures and tables.
+        \item Highlight (bold, background color) key messages.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    {Q\&A}
+    \begin{itemize}
+        \item Common types of questions
+            \begin{itemize}
+                \item Clarification: ``Can you explain X again?''
+                \item Interpration of the results: ``Why is there a dip in the learning curve?''
+                \item Comparison: ``How is this different from X?''
+                \item Extensions and new perspectives of the work (this is the type of questions we like)
+            \end{itemize}
+        \item It's okay to pause before you answer the question.
+        \item Provide your thoughts even if you have no idea what's the answer.
+    \end{itemize}
+\end{frame}
+
+\end{document}
